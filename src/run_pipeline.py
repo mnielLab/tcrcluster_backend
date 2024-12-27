@@ -6,10 +6,11 @@ module_path = os.path.abspath(os.path.join('..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
 import pandas as pd
+import seaborn as sns
 from cluster_utils import *
 from networkx_utils import *
 from torch_utils import load_model_full
-from utils import str2bool, make_filename, pkl_dump
+from utils import str2bool, make_jobid_filename, pkl_dump
 from datetime import datetime as dt
 
 
@@ -48,7 +49,7 @@ def args_parser():
     """
     Models args 
     """
-    parser.add_argument('-model', type=str, default='TSCSTRP',
+    parser.add_argument('-m', '--model', type=str, default='TSCSTRP',
                         help='which model to use ; can be "OSNOTRP", "OSCSTRP", "TSNOTRP", "TSCSTRP"')
     parser.add_argument('-index_col', type=str, required=False, default=None,
                         help='index col to sort both baselines and latent df')
@@ -73,7 +74,7 @@ def args_parser():
     """
     TODO: Misc. 
     """
-    parser.add_argument('-rid', '--random_id', dest='random_id', type=str, default=None,
+    parser.add_argument('-j', '--job_id', dest='job_id', type=str, default=None,
                         help='Adding a random ID taken from a batchscript that will start all crossvalidation folds. Default = ""')
     parser.add_argument('-n_jobs', dest='n_jobs', default=-1, type=int,
                         help='Multiprocessing')
@@ -85,7 +86,7 @@ def main():
     print('Starting MST-cut pyscript')
     sns.set_style('darkgrid')
     args = vars(args_parser())
-    unique_filename, kf, rid, connector = make_filename(args)
+    unique_filename, rid, connector = make_jobid_filename(args)
 
     # TODO: 
     # HERE NEED TO CHANGE OUTDIR
@@ -151,9 +152,8 @@ def main():
                                                                                                          args[
                                                                                                              'low_memory'])
 
-    if args['threshold'] is not None:
-        threshold = args['threshold']
-    else:
+
+    if args['threshold'] is None or args['threshold'] == "None":
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
                                                     args['n_points'], args['min_purity'], args['min_size'], 'micro',
                                                     args['n_jobs'])
@@ -163,6 +163,9 @@ def main():
         plot_sprm(optimisation_results, fn=f'{outdir}{unique_filename}optimisation_curves', random_label=random_label)
         threshold = optimisation_results.query('best')['threshold'].item()
         optimisation_results.to_csv(f'{outdir}{unique_filename}optimisation_results_df.csv')
+    else:
+        threshold = float(args['threshold'])
+
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
                                                              label_encoder, threshold,
                                                              'micro', args['min_purity'], args['min_size'],

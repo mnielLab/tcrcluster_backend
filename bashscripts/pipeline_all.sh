@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# This the main TCRcluster-1.0 script. It acts as the full pipeline, doing the NetMHCpan, KernDist, PepX query, and Python script
+# Yat, Dec 2024
+
+###############################################################################
+#               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
+###############################################################################
+
+if [ -z "$TMP" ]; then
+	export TMP=/scratch
+fi
+
+#!/bin/bash
+
+# Default values
+THRESHOLD=None
+USER_EXPR="false"
+MODEL="TSCSTRP"
+
+# Parse arguments from the form submission
+while (( $# > 0 )); do
+   case $1 in
+     "--jobid")
+       shift
+       JOBID=$1
+       ;;
+     "--model")
+       shift
+       MODEL=$1
+       ;;
+     "--threshold_type")
+       shift
+       THRESHOLD_TYPE=$1  # Capture the threshold type (None or custom)
+       ;;
+     "--t_value")
+       shift
+       T_VALUE=$1  # Capture the custom threshold value
+       ;;
+     "--infile")
+       shift
+       FILENAME=$1
+       ;;
+   esac
+   shift
+done
+
+# Handle threshold logic
+if [[ "$THRESHOLD_TYPE" == "custom" ]]; then
+    if [[ -z "$T_VALUE" ]]; then
+        echo "Error: Custom threshold selected but no value provided for --t_value."
+        exit 1
+    else
+        THRESHOLD=$T_VALUE  # Set the threshold to the custom value
+    fi
+elif [[ "$THRESHOLD_TYPE" == "None" ]]; then
+    THRESHOLD=None  # Use the default "None"
+else
+    echo "Error: Unknown threshold type '$THRESHOLD_TYPE'."
+    exit 1
+fi
+
+# Debugging (Optional: Print variables to check values)
+echo "JOBID: $JOBID"
+echo "MODEL: $MODEL"
+echo "FILENAME: $FILENAME"
+echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
+echo "THRESHOLD: $THRESHOLD"
+
+
+filename=$(basename ${FILENAME})
+basenm="${filename%.*}"
+
+# determine platform
+UNIX="Linux"
+AR="x86_64"
+
+# WWWROOT of web server
+WWWROOT=/var/www/html
+
+# WWWpath to service
+SERVICEPATH=/services/TCRcluster-1.0
+
+# other settings
+PLATFORM="${UNIX}_${AR}"
+USERDIR="/tools/src/"
+BASHDIR="${USERDIR}TCRcluster-1.0/bashscripts/"
+SRCDIR="${USERDIR}TCRcluster-1.0/src/"
+DATADIR="${USERDIR}TCRcluster-1.0/data/"
+TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
+chmod 755 $TMP
+PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
+
+mkdir -p ${TMP}
+mkdir -p /tmp/${JOBID}
+# Go to the bashdir and run the bash commands
+#
+
+# Go to the Python dir and run the final model script
+#cd ${PYDIR}
+cd ${SRCDIR}
+# TODO : check the arguments and change everything accordingly
+chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
+
+
+# Call the Python script with the correctly set threshold
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} -o "${TMP}"
+# > "${TMP}pylogs" 2>&1

@@ -43,6 +43,16 @@ def make_filename(args):
     return unique_filename, kf, rid, connector
 
 
+def make_jobid_filename(args):
+    connector = '' if args["out"] == '' else '_'
+
+    rid = args['job_id'] if (args['job_id'] is not None and args['job_id'] != '') \
+        else get_random_id() if (args['job_id'] == '' or args['job_id'] is None) else args['job_id']
+
+    unique_filename = f'{args["out"]}{connector}{get_datetime_string()}_{rid}'
+    return unique_filename, rid, connector
+
+
 def plot_criterion_annealing(n_epochs, criterion, xlim=0.9):
     assert hasattr(criterion, 'weight_kld_n') or hasattr(criterion, 'weight_kld') or hasattr(criterion,
                                                                                              'vae_loss'), f'No weight kld in criterion of class {type(criterion)}!'

@@ -1,3 +1,6 @@
-
+.idea/
 *.pyc
 /src/.ipynb_checkpoints
+.DS_Store
+models/.DS_Store
+src/.DS_Store
