@@ -131,7 +131,7 @@ PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
 
 cd ${SRCDIR}
 # TODO : check the arguments and change everything accordingly
-chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
+#chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
 # Call the Python script with the correctly set threshold
 $PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}"
 # > "${TMP}pylogs" 2>&1

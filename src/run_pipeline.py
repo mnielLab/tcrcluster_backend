@@ -62,6 +62,7 @@ def args_parser():
 
 
 def main():
+    print('Starting run_pipeline.py')
     start = dt.now()
     sns.set_style('darkgrid')
     args = vars(args_parser())
