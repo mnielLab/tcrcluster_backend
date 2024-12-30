@@ -62,7 +62,7 @@ def args_parser():
 
 
 def main():
-    print('Starting run_pipeline.py')
+    print('\nStarting run_pipeline.py\n')
     start = dt.now()
     sns.set_style('darkgrid')
     args = vars(args_parser())
@@ -152,6 +152,7 @@ def main():
                                                                                                              'low_memory'])
 
     if args['threshold'] is None or args['threshold'] == "None":
+        print('\nOptim\n')
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
                                                     args['n_points'], args['min_purity'], args['min_size'], 'micro',
                                                     args['n_jobs'])
@@ -164,6 +165,7 @@ def main():
     else:
         threshold = float(args['threshold'])
 
+    print('\nSingle threshold\n')
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
                                                      label_encoder, threshold,
                                                      min_purity = args['min_purity'], min_size=args['min_size'],
@@ -173,6 +175,7 @@ def main():
     dist_matrix['cluster_label'] = c.labels_
     if random_label:
         clusters_df.drop(columns=[label_col], inplace=True)
+    print('\nSaving\n')
     dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
