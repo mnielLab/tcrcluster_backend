@@ -46,7 +46,7 @@ def args_parser():
     """
     parser.add_argument('-np', '--n_points', dest='n_points', type=int, default=750,
                         help='How many points to do for the bounded limits')
-    parser.add_argument('-t', '--threshold', dest='threshold', type=float, default=None,
+    parser.add_argument('-t', '--threshold', dest='threshold', default=None,
                         help='If provided, will skip the n_points iteration thing and run a single clustering at the given threshold.')
     parser.add_argument('-mp', '--min_purity', dest='min_purity', type=float, default=.8,
                         help='minimum purity for n_above')
