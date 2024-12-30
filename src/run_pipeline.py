@@ -132,7 +132,7 @@ def main():
         index_col = 'index_col'
         latent_df[index_col] = [f'seq_{i:04}' for i in range(len(latent_df))]
 
-    seq_cols = tuple(args[f'{x.lower()}_col'] for x in ('A1', 'A2', 'A3', 'B1', 'B2', 'B3'))
+    seq_cols = ('A1', 'A2', 'A3', 'B1', 'B2', 'B3')
 
     # Here, if labels are not provided, we give it a random label column to not have to change all the code
     random_label = label_col is None or label_col == '' or label_col not in latent_df.columns
