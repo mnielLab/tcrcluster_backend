@@ -56,7 +56,7 @@ def args_parser():
     """
     parser.add_argument('-j', '--job_id', dest='job_id', type=str, default=None,
                         help='Adding a random ID taken from a batchscript that will start all crossvalidation folds. Default = ""')
-    parser.add_argument('-n_jobs', dest='n_jobs', default=-1, type=int,
+    parser.add_argument('-n_jobs', dest='n_jobs', default=20, type=int,
                         help='Multiprocessing')
     return parser.parse_args()
 
