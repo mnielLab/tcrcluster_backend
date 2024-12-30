@@ -133,5 +133,6 @@ cd ${SRCDIR}
 # TODO : check the arguments and change everything accordingly
 #chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
 # Call the Python script with the correctly set threshold
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}"
+# todo: DEBUG with -np 50 ; when done, remove
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 50
 # > "${TMP}pylogs" 2>&1
