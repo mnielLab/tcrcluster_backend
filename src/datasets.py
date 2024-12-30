@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset, SequentialSampler, RandomSampler
 from src.data_processing import encode_batch, batch_encode_cat, batch_positional_encode, V_MAP, J_MAP, PEP_MAP, \
     encoding_matrix_dict
-from overrides import override
+# from overrides import override
 
 from src.samplers import MinorityClassSampler
 
@@ -217,7 +217,7 @@ class TCRSpecificDataset(FullTCRDataset):
         self.df['minority_class'] = self.df[pep_col].apply(lambda x: x in low_number)
         self.minority_classes = [pepmap[x] for x in self.df.query('minority_class').peptide.unique()]
 
-    @override
+    # @override
     def __getitem__(self, idx):
         if self.pep_weighted:
             return self.x[idx], self.pep_weights[idx], self.labels[idx]
@@ -272,7 +272,7 @@ class TwoStageTCRpMHCDataset(TCRSpecificDataset):
         # self.x (where peptide seq can be encoded with TCR) uses `original_peptide`
         # meaning it's very easy for the model to learn inputs (swapped vs not swapped) and give 100% AUC
 
-    @override
+    # @override
     def __getitem__(self, idx):
         """
 
@@ -342,7 +342,7 @@ class LatentTCRpMHCDataset(FullTCRDataset):
         # Here labels are binary "binders" label, instead of pep_label for triplet loss
         self.labels = torch.from_numpy(df[label_col].values).unsqueeze(1).float()
 
-    @override
+    # @override
     def __getitem__(self, idx):
         if self.pep_weighted:
             return self.x[idx], self.pep_weights[idx], self.labels[idx]

@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 import torch
-from overrides import override
+# from overrides import override
 
 from src.torch_utils import mask_modality, filter_modality
 from torch import nn
@@ -252,12 +252,12 @@ class VAELoss(LossParent):
         # return self.base_weight_kld_n * (
         #         1 + math.tanh(self.kld_tanh_scale * (self.counter - 2 * self.kld_warm_up / 3))) / 2
 
-    @override
+    # @override
     def increment_counter(self):
         super(VAELoss, self).increment_counter()
         self._kld_weight_regime()
 
-    @override
+    # @override
     def set_counter(self, counter):
         super(VAELoss, self).set_counter(counter)
         self._kld_weight_regime()
@@ -313,12 +313,12 @@ class TripletLoss(LossParent):
         cd_cdt = self.counter <= self.cool_down if self.cool_down is not None else True
         self.activated = wu_cdt & cd_cdt & (self.weight > 0)
 
-    @override
+    # @override
     def increment_counter(self):
         super(TripletLoss, self).increment_counter()
         self._triplet_weight_regime()
 
-    @override
+    # @override
     def set_counter(self, counter):
         super(TripletLoss, self).set_counter(counter)
         self._triplet_weight_regime()
