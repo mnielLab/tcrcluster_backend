@@ -11,8 +11,6 @@ if [ -z "$TMP" ]; then
 	export TMP=/scratch
 fi
 
-#!/bin/bash
-
 # Default values
 THRESHOLD=None
 T_VALUE="None"
@@ -112,26 +110,28 @@ SERVICEPATH=/services/TCRcluster-1.0
 
 # other settings
 PLATFORM="${UNIX}_${AR}"
-USERDIR="/tools/src/"
-BASHDIR="${USERDIR}TCRcluster-1.0/bashscripts/"
-SRCDIR="${USERDIR}TCRcluster-1.0/src/"
-DATADIR="${USERDIR}TCRcluster-1.0/data/"
-TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
+USERDIR="/tools/src/TCRcluster-1.0"
+BASHDIR="${USERDIR}/bashscripts/"
+SRCDIR="${USERDIR}/src/"
+DATADIR="${USERDIR}/data/"
+
+# Use this as TMP dir for the webserver
+#TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
+
+# TODO : THIS IS FOR COMMANDLINE DEBUG ONLY
+TMP="${USERDIR}/tmp/${JOBID}/"
+
+# Make this
+mkdir -p ${TMP}
 chmod 755 $TMP
 PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
 
-mkdir -p ${TMP}
-mkdir -p /tmp/${JOBID}
-# Go to the bashdir and run the bash commands
-#
+#mkdir -p /tmp/${JOBID} # ??
 
-# Go to the Python dir and run the final model script
-#cd ${PYDIR}
+
 cd ${SRCDIR}
 # TODO : check the arguments and change everything accordingly
 chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
-
-
 # Call the Python script with the correctly set threshold
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} -o "${TMP}"
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}"
 # > "${TMP}pylogs" 2>&1

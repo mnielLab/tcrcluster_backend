@@ -19,33 +19,13 @@ def args_parser():
     """
     Data processing args
     """
-    parser.add_argument('-cuda', dest='cuda', default=False, type=str2bool,
-                        help="Will use GPU if True and GPUs are available")
-    parser.add_argument('-device', dest='device', default='cpu', type=str,
-                        help='device to use for cuda')
     parser.add_argument('-f', '--file', dest='file', required=True, type=str,
                         default='../data/filtered/231205_nettcr_old_26pep_with_swaps.csv',
                         help='filename of the input file')
-    # parser.add_argument('-tcrdist', '--tcrdist_file', dest='tcrdist_file', type=str,
-    #                     default=None, help='External labelled tcrdist baseline')
-    # parser.add_argument('-tbcralign', '--tbcralign_file', dest='tbcralign_file', type=str,
-    #                     default=None, help='External labelled tbcralign baseline')
     parser.add_argument('-o', '--out', dest='out', required=False,
                         type=str, default='', help='Additional output name')
     parser.add_argument('-od', '--outdir', dest='outdir', required=False,
-                        type=str, default=None, help='Additional output directory')
-    parser.add_argument('-a1', '--a1_col', dest='a1_col', default='A1', type=str, required=False,
-                        help='Name of the column containing B3 sequences (inputs)')
-    parser.add_argument('-a2', '--a2_col', dest='a2_col', default='A2', type=str, required=False,
-                        help='Name of the column containing B3 sequences (inputs)')
-    parser.add_argument('-a3', '--a3_col', dest='a3_col', default='A3', type=str, required=False,
-                        help='Name of the column containing B3 sequences (inputs)')
-    parser.add_argument('-b1', '--b1_col', dest='b1_col', default='B1', type=str, required=False,
-                        help='Name of the column containing B3 sequences (inputs)')
-    parser.add_argument('-b2', '--b2_col', dest='b2_col', default='B2', type=str, required=False,
-                        help='Name of the column containing B3 sequences (inputs)')
-    parser.add_argument('-b3', '--b3_col', dest='b3_col', default='B3', type=str, required=False,
-                        help='Name of the column containing B3 sequences (inputs)')
+                        type=str, default='../tmp/', help='Output directory, should be ${TMP} from the bashscript')
     """
     Models args 
     """
@@ -74,8 +54,6 @@ def args_parser():
     """
     TODO: Misc. 
     """
-    parser.add_argument('-nh', '--no_header', dest='no_header', type=str2bool, default=False,
-                        help='Workaround for inputs with no headers with A LOT OF ASSUMPTIONS')
     parser.add_argument('-j', '--job_id', dest='job_id', type=str, default=None,
                         help='Adding a random ID taken from a batchscript that will start all crossvalidation folds. Default = ""')
     parser.add_argument('-n_jobs', dest='n_jobs', default=-1, type=int,
@@ -87,22 +65,31 @@ def main():
     start = dt.now()
     sns.set_style('darkgrid')
     args = vars(args_parser())
+
+    # TODO : Make output filepath work. Here, need args['out'] as None,
+    #        Then define the outdir as the ${TMP} given by the bashscript
+    #        For debugging purpouses, here use '../tmp/' so that uniquefilename doesn't use it
+
     unique_filename, rid, connector = make_jobid_filename(args)
 
-    # TODO: 
-    # HERE NEED TO CHANGE OUTDIR
-    outdir = '../output/'
+    # run_name = f'{run_dt}_{run_tag}_{run_id}'
+    # outdir = os.path.join(args['outdir'], f'{run_name}/')
+    # mkdirs(outdir)
+    # jobid = str(args['jobid'])
+
+    # TODO: HERE NEED TO CHANGE OUTDIR
     # checkpoint_filename = f'checkpoint_best_{unique_filename}.pt'
-    if args['outdir'] is not None:
-        outdir = os.path.join(outdir, args['outdir'])
-        if not outdir.endswith('/'):
-            outdir = outdir + '/'
+    # if args['outdir'] is not None:
+    #     outdir = os.path.join(outdir, args['outdir'])
+    #     if not outdir.endswith('/'):
+    #         outdir = outdir + '/'
     # Here this is commented because we handle the uniquefilename creation already
     # in the overall bash script
     # TODO : These things here need to change for a Webserver
-
-    outdir = os.path.join(outdir, unique_filename) + '/'
+    args['device'] = 'cpu'
+    outdir = os.path.join(args['outdir'], unique_filename) + '/'
     mkdirs(outdir)
+
     # dumping args to file
     with open(f'{outdir}args_{unique_filename}.txt', 'w') as file:
         for key, value in args.items():
@@ -196,4 +183,6 @@ def main():
 
 
 if __name__ == '__main__':
+    # TODO : Need to change this so that the results are downloadable
+    #
     main()
