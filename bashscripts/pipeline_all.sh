@@ -15,64 +15,65 @@ fi
 THRESHOLD=None
 T_VALUE="None"
 MODEL="TSCSTRP"
-#
-## Parse arguments from the form submission
-#while (( $# > 0 )); do
-#   case $1 in
-#     "--jobid")
-#       shift
-#       JOBID=$1
-#       ;;
-#     "--model")
-#       shift
-#       MODEL=$1
-#       ;;
-#     "--threshold_type")
-#       shift
-#       THRESHOLD_TYPE=$1  # Capture the threshold type (None or custom)
-#       ;;
-#     "--t_value")
-#       shift
-#       T_VALUE=$1  # Capture the custom threshold value
-#       ;;
-#     "--infile")
-#       shift
-#       FILENAME=$1
-#       ;;
-#   esac
-#   shift
-#done
 
-# TODO : This is for command-line script debugging ; Comment this and switch to form submission
-while getopts ":f:j:m:t:v:" opt; do
-  case ${opt} in
-    f )
-      FILENAME=$OPTARG
-      ;;
-    j )
-      JOBID=$OPTARG
-      ;;
-    m )
-      MODEL=$OPTARG
-      ;;
-    t )
-      THRESHOLD_TYPE="$OPTARG"
-      ;;
-    v )
-      T_VALUE=$OPTARG
-      ;;
-    \? )
-      echo "Usage: $0 -f <INPUTFILE> -o <OUTPUTDIRECTORY> -c <CHAINS> (ex: A1 A2 A3 B1 B2 B3) -s <SERVER> (c2/htc) -l <LABELCOL> -e <EXTRACOLS> -i <INDEXCOL>"
-      exit 1
-      ;;
-    : )
-      echo "Invalid option: -$OPTARG requires an argument"
-      exit 1
-      ;;
-  esac
+# Parse arguments from the form submission
+while (( $# > 0 )); do
+   case $1 in
+     "--jobid")
+       shift
+       JOBID=$1
+       ;;
+     "--model")
+       shift
+       MODEL=$1
+       ;;
+     "--threshold_type")
+       shift
+       THRESHOLD_TYPE=$1  # Capture the threshold type (None or custom)
+       ;;
+     "--t_value")
+       shift
+       T_VALUE=$1  # Capture the custom threshold value
+       ;;
+     "--infile")
+       shift
+       FILENAME=$1
+       ;;
+   esac
+   shift
 done
 
+# TODO : This is for command-line script debugging ; Comment this and switch to form submission
+#while getopts ":f:j:m:t:v:" opt; do
+#  case ${opt} in
+#    f )
+#      FILENAME=$OPTARG
+#      ;;
+#    j )
+#      JOBID=$OPTARG
+#      ;;
+#    m )
+#      MODEL=$OPTARG
+#      ;;
+#    t )
+#      THRESHOLD_TYPE="$OPTARG"
+#      ;;
+#    v )
+#      T_VALUE=$OPTARG
+#      ;;
+#    \? )
+#      echo "Usage: $0 -f <INPUTFILE> -o <OUTPUTDIRECTORY> -c <CHAINS> (ex: A1 A2 A3 B1 B2 B3) -s <SERVER> (c2/htc) -l <LABELCOL> -e <EXTRACOLS> -i <INDEXCOL>"
+#      exit 1
+#      ;;
+#    : )
+#      echo "Invalid option: -$OPTARG requires an argument"
+#      exit 1
+#      ;;
+#  esac
+#done
+
 # Handle threshold logic
+
 if [[ "$THRESHOLD_TYPE" == "custom" ]]; then
     if [[ -z "$T_VALUE" || "$T_VALUE" == "None" ]]; then
       echo "Error: Custom threshold selected but no value provided for --t_value."
@@ -116,23 +117,20 @@ SRCDIR="${USERDIR}/src/"
 DATADIR="${USERDIR}/data/"
 
 # Use this as TMP dir for the webserver
-#TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
-
+TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
 # TODO : THIS IS FOR COMMANDLINE DEBUG ONLY
-TMP="${USERDIR}/tmp/${JOBID}/"
+#TMP="${USERDIR}/tmp/${JOBID}/"
 
 # Make this
 mkdir -p ${TMP}
+mkdir -p /tmp/${JOBID} # ??
 chmod 755 $TMP
-PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
-
-#mkdir -p /tmp/${JOBID} # ??
-
 
 cd ${SRCDIR}
 # TODO : check the arguments and change everything accordingly
-#chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
+chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
 # Call the Python script with the correctly set threshold
-# todo: DEBUG with -np 50 ; when done, remove
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 10 -n_jobs 5
+PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
+# todo: DEBUG with -np 10, njob 5 ; when done, remove
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" n_jobs 20 # -np 10 -n_jobs 5
 # > "${TMP}pylogs" 2>&1
