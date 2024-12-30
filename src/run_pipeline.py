@@ -53,7 +53,7 @@ def args_parser():
                         help='which model to use ; can be "OSNOTRP", "OSCSTRP", "TSNOTRP", "TSCSTRP"')
     parser.add_argument('-index_col', type=str, required=False, default=None,
                         help='index col to sort both baselines and latent df')
-    parser.add_argument('-label_col', type=str, required=False, default=None,
+    parser.add_argument('-label_col', type=str, required=False, default='label',
                         help='column containing the labels (eg peptide)')
     parser.add_argument('-weight_col', type=str, required=False, default=None,
                         help='Column that contains the weight for a count (ex: norm_count); Leave empty to not use it')
@@ -74,6 +74,8 @@ def args_parser():
     """
     TODO: Misc. 
     """
+    parser.add_argument('-nh', '--no_header', dest='no_header', type=str2bool, default=False,
+                        help='Workaround for inputs with no headers with A LOT OF ASSUMPTIONS')
     parser.add_argument('-j', '--job_id', dest='job_id', type=str, default=None,
                         help='Adding a random ID taken from a batchscript that will start all crossvalidation folds. Default = ""')
     parser.add_argument('-n_jobs', dest='n_jobs', default=-1, type=int,
@@ -83,7 +85,6 @@ def args_parser():
 
 def main():
     start = dt.now()
-    print('Starting MST-cut pyscript')
     sns.set_style('darkgrid')
     args = vars(args_parser())
     unique_filename, rid, connector = make_jobid_filename(args)
@@ -98,8 +99,9 @@ def main():
             outdir = outdir + '/'
     # Here this is commented because we handle the uniquefilename creation already
     # in the overall bash script
-    # outdir = os.path.join(outdir, unique_filename) + '/'
-    # TODO : These things here need to change for a Webserver 
+    # TODO : These things here need to change for a Webserver
+
+    outdir = os.path.join(outdir, unique_filename) + '/'
     mkdirs(outdir)
     # dumping args to file
     with open(f'{outdir}args_{unique_filename}.txt', 'w') as file:
@@ -110,23 +112,31 @@ def main():
     df = pd.read_csv(args['file'])
     # TODO : Hardcoded path or something server specific but the main directory would be in engine/src/tools/etc/models/
     # --> create directory structure to have each model saved in a separate folder and make loading easy
-    # --> IF we need to do tcrbase etc maybe create a bash script that houses this code as embedded code ?
-    model_paths = {'OSNOTRP': {'pt': ..., 'json': ...},
-                   'OSCSTRP': {'pt': ..., 'json': ...},
-                   'TSNOTRP': {'pt': ..., 'json': ...},
-                   'TSCSTRP': {'pt': ..., 'json': ...}}
+    model_paths = {'OSNOTRP': {'pt': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni.pt',
+                               'json': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni_JSON_kwargs.json'},
+                   'OSCSTRP': {'pt': '../models/OneStage_CosTriplet_ER8wJ/checkpoint_best_OneStage_CosTriplet_ER8wJ.pt',
+                               'json':'../models/OneStage_CosTriplet_ER8wJ/checkpoint_best_OneStage_CosTriplet_ER8wJ_JSON_kwargs.json'},
+                   'TSNOTRP': {'pt': '../models/TwoStage_NoTriplet_N1jMC/epoch_4500_interval_checkpoint_TwoStage_NoTriplet_N1jMC.pt',
+                               'json': '../models/TwoStage_NoTriplet_N1jMC/checkpoint_best_TwoStage_NoTriplet_N1jMC_JSON_kwargs.json'},
+                   'TSCSTRP': {'pt': '../models/TwoStage_CosTriplet_jyGpd/epoch_4500_interval_checkpoint_TwoStage_CosTriplet_jyGpd.pt',
+                               'json': '../models/TwoStage_CosTriplet_jyGpd/checkpoint_best_TwoStage_CosTriplet_jyGpd_JSON_kwargs.json'}}
     assert args['model'] in model_paths.keys(), f"model provided is {args['model']} and is not in the keys of the dict!"
     model_paths = model_paths[args['model']]
     model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=True)
 
+    # TODO: Handle input with or without header ?_?
     index_col = args['index_col']
     label_col = args['label_col']
-    rest_cols = args['rest_cols']
-    weight_col = args['weight_col']
-    if weight_col is not None:
-        if weight_col not in rest_cols and weight_col in df.columns:
-            rest_cols.append(weight_col)
+    # rest_cols = args['rest_cols']
+    rest_cols = [x for x in df.columns if x not in ['A1','A2','A3','B1','B2','B3','label']]
 
+    # # TODO : phase this out ;
+    # weight_col = args['weight_col']
+    # if weight_col is not None:
+    #     if weight_col not in rest_cols and weight_col in df.columns:
+    #         rest_cols.append(weight_col)
+
+    # TODO : Merge latent df back to predicted cluster df
     latent_df = get_latent_df(model, df)
 
     # Here, if indices are not provided, we give it a random index column to not have to change all the code
@@ -137,12 +147,13 @@ def main():
     seq_cols = tuple(args[f'{x.lower()}_col'] for x in ('A1', 'A2', 'A3', 'B1', 'B2', 'B3'))
 
     # Here, if labels are not provided, we give it a random label column to not have to change all the code
-    random_label = label_col is None or label_col == ''
+    random_label = label_col is None or label_col == '' or label_col not in latent_df.columns
     if random_label:
         label_col = 'placeholder_label'
         random_classes = np.random.randint(2, 7, 1)[0]
         labels = [f'class_{i}' for i in range(random_classes)]
         latent_df[label_col] = np.random.choice(labels, (len(latent_df)), replace=True)
+        rest_cols.append(label_col)
 
     dist_matrix, dist_array, _, labels, encoded_labels, label_encoder = get_distances_labels_from_latent(latent_df,
                                                                                                          label_col,
@@ -151,7 +162,6 @@ def main():
                                                                                                          rest_cols,
                                                                                                          args[
                                                                                                              'low_memory'])
-
 
     if args['threshold'] is None or args['threshold'] == "None":
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
@@ -167,15 +177,22 @@ def main():
         threshold = float(args['threshold'])
 
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
-                                                             label_encoder, threshold,
-                                                             'micro', args['min_purity'], args['min_size'],
-                                                             return_df_and_c=True)
+                                                     label_encoder, threshold,
+                                                     min_purity = args['min_purity'], min_size=args['min_size'],
+                                                     silhouette_aggregation='micro',
+                                                     return_df_and_c=True)
+    # Assigning labels and saving
+    dist_matrix['cluster_label'] = c.labels_
     if random_label:
         clusters_df.drop(columns=[label_col], inplace=True)
-    clusters_df.to_csv(f'{outdir}{unique_filename}output_clusters_df.csv')
+    dist_matrix['cluster_label'] = c.labels_
+    keep_columns = ['index_col', 'cluster_label']
+    results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
+    clusters_df.to_csv(f'{outdir}{unique_filename}clusters_summary.csv', index=False)
+    results_df.to_csv(f'{outdir}{unique_filename}TCRcluster_results.csv', index=False)
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
-    print(f'MST-cut finished in {elapsed[0]} minutes, {elapsed[1]} seconds.')
+    print(f'Finished in {elapsed[0]} minutes, {elapsed[1]} seconds.')
 
 
 if __name__ == '__main__':

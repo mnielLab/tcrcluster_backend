@@ -22,8 +22,6 @@ from src.conv_models import CNNVAE
 from src.datasets import FullTCRDataset
 from src.metrics import custom_silhouette_score
 from src.models import TwoStageVAECLF, FullTCRVAE
-from src.multimodal_datasets import MultimodalMarginalLatentDataset
-from src.multimodal_models import BSSVAE, JMVAE
 from src.networkx_utils import create_mst_from_distance_matrix, iterative_size_cut, iterative_topn_cut, \
     iterative_topn_cut_logsize
 from src.sim_utils import make_dist_matrix
@@ -1117,16 +1115,6 @@ def get_latent_df(model, df, dataset_params: dict = None, batch_size=512):
         dataloader = dataset.get_dataloader(batch_size, SequentialSampler)
         latent_df = predict_model(model, dataset, dataloader)
 
-    # TODO: This part probly not properly handled
-    elif type(model) in [BSSVAE, JMVAE]:
-        dataset_params['pair_only'] = True
-        dataset_params['return_pair'] = type(model) == JMVAE
-        dataset_params['modality'] = 'tcr'
-        dataset = MultimodalMarginalLatentDataset(model, df, **dataset_params)
-        latent_df = df.copy()
-        zdim = dataset.z.shape[1]
-        latent_df[[f'z_{i}' for i in range(zdim)]] = dataset.z
-
     return latent_df
 
 
@@ -1139,6 +1127,8 @@ def get_distances_labels_from_latent(latent_df, label_col='peptide', seq_cols=('
             x in ['peptide', 'original_peptide', 'partition', 'origin', 'binder', index_col])
     if index_col not in rest_cols:
         rest_cols.append(index_col)
+    if label_col not in rest_cols:
+        rest_cols.append(label_col)
     # Getting distmatrix and arrays
     dist_matrix = make_dist_matrix(latent_df, label_col, seq_cols, cols=rest_cols, low_memory=low_memory)
     dist_array = dist_matrix.iloc[:len(dist_matrix), :len(dist_matrix)].values
@@ -1489,9 +1479,7 @@ def agglo_single_threshold(dist_array, features, labels, encoded_labels, label_e
     c.fit(dist_array)
     if return_df_and_c:
         return *get_all_metrics(threshold, dist_array, c, dist_array, labels, encoded_labels, label_encoder,
-                                silhouette_aggregation,
-                                min_purity=min_purity, min_size=min_size,
-                                return_df=return_df_and_c), c
+                                silhouette_aggregation, min_purity=min_purity, min_size=min_size, return_df=return_df_and_c), c
     else:
         return get_all_metrics(threshold, dist_array, c, dist_array, labels, encoded_labels, label_encoder,
                                silhouette_aggregation,

@@ -2,11 +2,10 @@ import glob
 import os
 from typing import Dict
 
-from .utils import mkdirs
+from src.utils import mkdirs
 from torch.nn import LeakyReLU, ELU, SELU, ReLU
 import json
 from src.models import *
-from src.multimodal_models import *
 from src.conv_models import *
 
 ACT_DICT = {'SELU': nn.SELU(), 'ReLU': nn.ReLU(),

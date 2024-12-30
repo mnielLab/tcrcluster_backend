@@ -812,6 +812,7 @@ def plot_sprm(df, title=None, fn=None, burn_in=0.05, vline=None, random_label=Fa
         twa = a.twinx()
         twa.set_yscale('log', base=2)
         twa.grid(False)
+        twa.set_ylabel('Amount (Log2 Scale)')
     if 'mean_cluster_size' in df.columns:
         m = df['mean_cluster_size']
         twa.plot(x, m, label='mean size', ls='--', lw=1, c='m')
@@ -825,6 +826,8 @@ def plot_sprm(df, title=None, fn=None, burn_in=0.05, vline=None, random_label=Fa
     # Take after the 5% of cuts to avoid getting the best silhouette at the very start ?
     a.axvline(df.loc[int(burn_in * len(df)):]['silhouette'].idxmax(), label='max SI', ls=':', lw=1, c='k')
     a.legend()
+    a.set_xlabel('Iteration')
+    a.set_ylabel('Value (0-1)')
     twa.legend()
     if 'n_above' in df.columns:
         twa.set_ylim([1, max(df['n_above'].max()+2, df['mean_cluster_size'].max()+2)])

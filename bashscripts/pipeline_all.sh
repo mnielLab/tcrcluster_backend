@@ -15,41 +15,70 @@ fi
 
 # Default values
 THRESHOLD=None
-USER_EXPR="false"
+T_VALUE="None"
 MODEL="TSCSTRP"
+#
+## Parse arguments from the form submission
+#while (( $# > 0 )); do
+#   case $1 in
+#     "--jobid")
+#       shift
+#       JOBID=$1
+#       ;;
+#     "--model")
+#       shift
+#       MODEL=$1
+#       ;;
+#     "--threshold_type")
+#       shift
+#       THRESHOLD_TYPE=$1  # Capture the threshold type (None or custom)
+#       ;;
+#     "--t_value")
+#       shift
+#       T_VALUE=$1  # Capture the custom threshold value
+#       ;;
+#     "--infile")
+#       shift
+#       FILENAME=$1
+#       ;;
+#   esac
+#   shift
+#done
 
-# Parse arguments from the form submission
-while (( $# > 0 )); do
-   case $1 in
-     "--jobid")
-       shift
-       JOBID=$1
-       ;;
-     "--model")
-       shift
-       MODEL=$1
-       ;;
-     "--threshold_type")
-       shift
-       THRESHOLD_TYPE=$1  # Capture the threshold type (None or custom)
-       ;;
-     "--t_value")
-       shift
-       T_VALUE=$1  # Capture the custom threshold value
-       ;;
-     "--infile")
-       shift
-       FILENAME=$1
-       ;;
-   esac
-   shift
+# TODO : This is for command-line script debugging ; Comment this and switch to form submission
+while getopts ":f:j:m:t:v:" opt; do
+  case ${opt} in
+    f )
+      FILENAME=$OPTARG
+      ;;
+    j )
+      JOBID=$OPTARG
+      ;;
+    m )
+      MODEL=$OPTARG
+      ;;
+    t )
+      THRESHOLD_TYPE="$OPTARG"
+      ;;
+    v )
+      T_VALUE=$OPTARG
+      ;;
+    \? )
+      echo "Usage: $0 -f <INPUTFILE> -o <OUTPUTDIRECTORY> -c <CHAINS> (ex: A1 A2 A3 B1 B2 B3) -s <SERVER> (c2/htc) -l <LABELCOL> -e <EXTRACOLS> -i <INDEXCOL>"
+      exit 1
+      ;;
+    : )
+      echo "Invalid option: -$OPTARG requires an argument"
+      exit 1
+      ;;
+  esac
 done
 
 # Handle threshold logic
 if [[ "$THRESHOLD_TYPE" == "custom" ]]; then
-    if [[ -z "$T_VALUE" ]]; then
-        echo "Error: Custom threshold selected but no value provided for --t_value."
-        exit 1
+    if [[ -z "$T_VALUE" || "$T_VALUE" == "None" ]]; then
+      echo "Error: Custom threshold selected but no value provided for --t_value."
+      exit 1
     else
         THRESHOLD=$T_VALUE  # Set the threshold to the custom value
     fi
