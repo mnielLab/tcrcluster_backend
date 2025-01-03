@@ -68,7 +68,7 @@ def args_parser():
 
 
 def main():
-    print('\nStarting run_pipeline.py\n')
+    # print('\nStarting run_pipeline.py\n')
     # ev = dict(os.environ)
     # for k,v in ev.items():
     #     print(f'{k}: {v}')
@@ -111,8 +111,8 @@ def main():
                        'json': '../models/TwoStage_CosTriplet_jyGpd/checkpoint_best_TwoStage_CosTriplet_jyGpd_JSON_kwargs.json'}}
     assert args['model'] in model_paths.keys(), f"model provided is {args['model']} and is not in the keys of the dict!"
     model_paths = model_paths[args['model']]
-    model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=False)
-    print('Loaded model')
+    model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=False);
+    # print('Loaded model')
     # TODO: Handle input with or without header ?_?
     index_col = args['index_col']
     label_col = args['label_col']

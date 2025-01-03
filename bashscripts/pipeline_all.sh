@@ -126,9 +126,9 @@ chmod 755 $SRCDIR
 PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
 #PYTHON=/home/people/riwa/anaconda3/envs/cuda/bin/python3.11
 # todo: DEBUG with -np 10, njob 5 ; when done, remove
-echo "Starting python script in $(pwd)"
+#echo "Starting python script in $(pwd)"
 # Debugging (Optional: Print variables to check values)
-echo "PYTHON: $PYTHON"
+#echo "PYTHON: $PYTHON"
 echo "JOBID: $JOBID"
 echo "MODEL: $MODEL"
 echo "FILENAME: $FILENAME"
@@ -136,4 +136,4 @@ echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
 echo "THRESHOLD: $THRESHOLD"
 #echo "TMP: $TMP"
 
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 300 -n_jobs 20 #> "${TMP}pylogs.log" 2>&1
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 300 -n_jobs 20 > "${TMP}pylogs.log" 2>&1
