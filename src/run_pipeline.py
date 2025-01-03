@@ -216,7 +216,7 @@ if __name__ == '__main__':
         best_index = optimisation_results.query('best').index
         min_index = max(0, (best_index - 25).item())
         max_index = min((best_index + 25).item(), 500)
-        print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singleton',
+        print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singletons',
                                                              'silhouette', 'mean_purity', 'retention',
                                                              'min_cluster_size', 'mean_cluster_size', 'max_cluster_size']])
 
