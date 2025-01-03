@@ -97,6 +97,7 @@ def main():
     # TODO : These things here need to change for a Webserver
     args['device'] = 'cpu'
     outdir = os.path.join(args['outdir'], unique_filename) + '/'
+    print(outdir)
     mkdirs(outdir)
     print('Made outdir')
     # dumping args to file
