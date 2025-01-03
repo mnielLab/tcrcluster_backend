@@ -116,6 +116,7 @@ chmod 755 $TMP
 
 # Make this
 mkdir -p ${TMP}
+chmod 755 $TMP
 mkdir -p /tmp/${JOBID} # ??
 
 cd ${SRCDIR}
