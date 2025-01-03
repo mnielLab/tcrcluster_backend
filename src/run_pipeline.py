@@ -152,7 +152,10 @@ def main():
                                                                                                          args[
                                                                                                              'low_memory'])
     dist_array = dist_matrix.iloc[:len(dist_matrix), :len(dist_matrix)].values
-    c = AgglomerativeClustering(n_clusters=None, metric='precomputed')
+    try:
+        c = AgglomerativeClustering(n_clusters=None, metric='precomputed')
+    except:
+        c = AgglomerativeClustering(n_clusters=None, affinity='precomputed')
     if args['threshold'] is None or args['threshold'] == "None":
         print('\nOptim\n')
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,

@@ -873,7 +873,11 @@ def pipeline_best_model_clustering(model_folder, input_df, name, n_points=500):
 
 def cluster_single_threshold(dist_array, features, labels, encoded_labels, label_encoder, threshold,
                              silhouette_aggregation='micro', return_df_and_c=False):
-    c = AgglomerativeClustering(n_clusters=None, metric='precomputed', distance_threshold=threshold, linkage='complete')
+    try:
+        c = AgglomerativeClustering(n_clusters=None, metric='precomputed', distance_threshold=threshold, linkage='complete')
+    except:
+        c = AgglomerativeClustering(n_clusters=None, affinity='precomputed', distance_threshold=threshold,
+                                    linkage='complete')
     c.fit(dist_array)
     if return_df_and_c:
         return *get_all_metrics(threshold, features, c, dist_array, labels, encoded_labels, label_encoder,
@@ -1475,7 +1479,12 @@ def kmeans_pipeline(model, df, model_name=None, dataset_name=None, partition=Non
 def agglo_single_threshold(dist_array, features, labels, encoded_labels, label_encoder, threshold,
                            min_purity=0.8, min_size=6,
                            silhouette_aggregation='micro', return_df_and_c=False):
-    c = AgglomerativeClustering(n_clusters=None, metric='precomputed', distance_threshold=threshold, linkage='complete')
+    try:
+        c = AgglomerativeClustering(n_clusters=None, metric='precomputed', distance_threshold=threshold,
+                                    linkage='complete')
+    except:
+        c = AgglomerativeClustering(n_clusters=None, affinity='precomputed', distance_threshold=threshold,
+                                    linkage='complete')
     c.fit(dist_array)
     if return_df_and_c:
         return *get_all_metrics(threshold, dist_array, c, dist_array, labels, encoded_labels, label_encoder,
