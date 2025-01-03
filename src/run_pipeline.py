@@ -80,7 +80,7 @@ def main():
     #        Then define the outdir as the ${TMP} given by the bashscript
     #        For debugging purpouses, here use '../tmp/' so that uniquefilename doesn't use it
     print(args)
-    unique_filename, rid, connector = make_jobid_filename(args)
+    unique_filename, jobid, connector = make_jobid_filename(args)
 
     args['device'] = 'cpu'
     outdir = os.path.join(args['outdir'], unique_filename) + '/'
