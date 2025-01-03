@@ -78,9 +78,9 @@ def main():
     # TODO : Make output filepath work. Here, need args['out'] as None,
     #        Then define the outdir as the ${TMP} given by the bashscript
     #        For debugging purpouses, here use '../tmp/' so that uniquefilename doesn't use it
-
+    print(args)
     unique_filename, rid, connector = make_jobid_filename(args)
-
+    print('Got jobid etc')
     # run_name = f'{run_dt}_{run_tag}_{run_id}'
     # outdir = os.path.join(args['outdir'], f'{run_name}/')
     # mkdirs(outdir)
