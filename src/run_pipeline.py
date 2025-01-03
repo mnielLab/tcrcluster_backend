@@ -79,12 +79,12 @@ def main():
     # TODO : Make output filepath work. Here, need args['out'] as None,
     #        Then define the outdir as the ${TMP} given by the bashscript
     #        For debugging purpouses, here use '../tmp/' so that uniquefilename doesn't use it
-    print(args)
+    # print(args)
     unique_filename, jobid, connector = make_jobid_filename(args)
 
     args['device'] = 'cpu'
     outdir = os.path.join(args['outdir'], unique_filename) + '/'
-    print(outdir)
+    # print(outdir)
     mkdirs(outdir)
     # dumping args to file
     with open(f'{outdir}args_{unique_filename}.txt', 'w') as file:
@@ -157,42 +157,42 @@ def main():
     except:
         c = AgglomerativeClustering(n_clusters=None, affinity='precomputed')
     if args['threshold'] is None or args['threshold'] == "None":
-        print('\nOptim\n')
+        # print('\nOptim\n')
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
                                                     args['n_points'], args['min_purity'], args['min_size'], 'micro',
                                                     args['n_jobs'])
-        print('Got optim')
+        # print('Got optim')
         optimisation_results['best'] = False
         optimisation_results.loc[
             optimisation_results.iloc[:int(0.8 * len(optimisation_results))]['silhouette'].idxmax(), 'best'] = True
         plot_sprm(optimisation_results, fn=f'{outdir}{unique_filename}optimisation_curves', random_label=random_label)
         threshold = optimisation_results.query('best')['threshold'].item()
         optimisation_results.to_csv(f'{outdir}{unique_filename}optimisation_results_df.csv')
-        print('saved optim')
+        # print('saved optim')
     else:
         threshold = float(args['threshold'])
         optimisation_results = None
-    print('\nSingle threshold\n')
+    # print('\nSingle threshold\n')
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
                                                      label_encoder, threshold,
                                                      min_purity=args['min_purity'], min_size=args['min_size'],
                                                      silhouette_aggregation='micro',
                                                      return_df_and_c=True)
-    print('Done single threshold')
+    # print('Done single threshold')
     # Assigning labels and saving
     dist_matrix['cluster_label'] = c.labels_
     if random_label:
         clusters_df.drop(columns=[label_col], inplace=True)
-    print('\nSaving\n')
+    # print('\nSaving\n')
     dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
-    print('Merged dfs')
+    # print('Merged dfs')
     clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
-    print(f'Finished in {elapsed[0]} minutes, {elapsed[1]} seconds.')
+    # print(f'Finished in {elapsed[0]} minutes, {elapsed[1]} seconds.')
     return results_df, clusters_df, optimisation_results, unique_filename, jobid
 
 
