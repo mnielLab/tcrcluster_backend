@@ -217,7 +217,7 @@ if __name__ == '__main__':
                 'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
 
         print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
-              "A total of 500 points are tested, showing only 30 points centered around the best solution."
+              "A total of 300 points are tested, showing only 30 points centered around the best solution."
               "\nthe 'best' column denotes the best silhouette solution.\n")
         best_index = optimisation_results.query('best').index
         min_index = max(0, (best_index - 15).item())
