@@ -1501,7 +1501,6 @@ def agglo_all_thresholds(dist_array, features, labels, encoded_labels, label_enc
                          silhouette_aggregation='micro', n_jobs=1):
     assert type(dist_array)==np.ndarray, f'{type(dist_array)}'
     assert dist_array.shape[0] == dist_array.shape[1], f'{dist_array.shape}'
-    print(label_encoder, decimals, n_points, min_size, min_purity, silhouette_aggregation, n_jobs)
     # Getting clustering at all thresholds
     limits = get_linspace(dist_array, decimals, n_points)
     if n_jobs > 1 or n_jobs == -1:
