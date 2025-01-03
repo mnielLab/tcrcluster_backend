@@ -168,7 +168,7 @@ def main():
         plot_sprm(optimisation_results, fn=f'{outdir}{unique_filename}optimisation_curves', random_label=random_label)
         threshold = optimisation_results.query('best')['threshold'].item()
         optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']] = optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
-        optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].astype(int)
+        optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].round(0)
         optimisation_results.to_csv(f'{outdir}{unique_filename}optimisation_results_df.csv')
         # print('saved optim')
     else:
