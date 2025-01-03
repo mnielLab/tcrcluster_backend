@@ -88,14 +88,6 @@ else
     exit 1
 fi
 
-# Debugging (Optional: Print variables to check values)
-echo "JOBID: $JOBID"
-echo "MODEL: $MODEL"
-echo "FILENAME: $FILENAME"
-echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
-echo "THRESHOLD: $THRESHOLD"
-
-
 filename=$(basename ${FILENAME})
 basenm="${filename%.*}"
 
@@ -132,4 +124,14 @@ chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
 # Call the Python script with the correctly set threshold
 PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
 # todo: DEBUG with -np 10, njob 5 ; when done, remove
+echo "Starting python script with"
+# Debugging (Optional: Print variables to check values)
+echo "JOBID: $JOBID"
+echo "MODEL: $MODEL"
+echo "FILENAME: $FILENAME"
+echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
+echo "THRESHOLD: $THRESHOLD"
+echo "TMP: $TMP"
+
+
 $PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 60 -n_jobs 10 > "${TMP}pylogs" 2>&1
