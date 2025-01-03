@@ -56,7 +56,7 @@ while getopts ":f:j:m:t:v:" opt; do
       MODEL=$OPTARG
       ;;
     t )
-      THRESHOLD_TYPE="$OPTARG"
+      THRESHOLD_TYPE=$OPTARG
       ;;
     v )
       T_VALUE=$OPTARG
@@ -73,7 +73,7 @@ while getopts ":f:j:m:t:v:" opt; do
 done
 
 # Handle threshold logic
-
+echo $THRESHOLD_TYPE
 if [[ "$THRESHOLD_TYPE" == "custom" ]]; then
     if [[ -z "$T_VALUE" || "$T_VALUE" == "None" ]]; then
       echo "Error: Custom threshold selected but no value provided for --t_value."
