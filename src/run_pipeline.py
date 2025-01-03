@@ -1,28 +1,25 @@
-try :
-    import argparse
-    from tqdm.auto import tqdm
-    import os, sys
-    module_path = os.path.abspath(os.path.join('../..'))
-    if module_path not in sys.path:
-        sys.path.append(module_path)
-    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
-    if parent_dir not in sys.path:
-        sys.path.append(parent_dir)
-    # Get the absolute path of the "src" directory and HARDCODEDDLY ADDING IT
-    src_path = '/home/local/tools/src/TCRcluster-1.0/src/'
-    # Add the "src" directory to the Python module search path
-    sys.path.append(src_path)
-    import pandas as pd
-    import seaborn as sns
-    from cluster_utils import *
-    from networkx_utils import *
-    from torch_utils import load_model_full
-    from utils import str2bool, make_jobid_filename, pkl_dump
-    from datetime import datetime as dt
-except:
-    print(src_path, '\n')
-    print(sys.path, '\n')
-    raise ValueError('Couldn\'t import stuff??')
+import argparse
+from tqdm.auto import tqdm
+import os, sys
+module_path = os.path.abspath(os.path.join('../..'))
+if module_path not in sys.path:
+    sys.path.append(module_path)
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+# Get the absolute path of the "src" directory and HARDCODEDDLY ADDING IT
+src_path = '/home/local/tools/src/TCRcluster-1.0/src/'
+# Add the "src" directory to the Python module search path
+sys.path.append(src_path)
+import pandas as pd
+import seaborn as sns
+from cluster_utils import *
+from networkx_utils import *
+from torch_utils import load_model_full
+from utils import str2bool, make_jobid_filename, pkl_dump
+from datetime import datetime as dt
+print(src_path, '\n')
+print(sys.path, '\n')
 
 
 def args_parser():
@@ -207,27 +204,27 @@ def main():
 if __name__ == '__main__':
     # TODO : Check the tmp output path and make this downloadable
     results_df, clusters_df, optimisation_results, unique_filename, jobid = main()
-    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-          + f'{jobid}/{unique_filename}/' \
-            'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the latent vector and predicted clusters in .csv format.')
-
-    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-          + f'{jobid}/{unique_filename}/' \
-            'clusters_summary.csv" target="_blank">here</a>' + ' to download the cluster summary in .csv format.')
-
-    if optimisation_results is not None:
-        pd.set_option('display.max_columns', 30)
-        pd.set_option('display.max_rows', 101)
-        print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
-              "A total of 500 points are tested, showing only 50 points centered around the best solution."
-              "\nthe 'best' column denotes the best silhouette solution.\n")
-        best_index = optimisation_results.query('best').index
-        min_index = max(0, (best_index - 25).item())
-        max_index = min((best_index + 25).item(), 500)
-        print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singleton',
-                                                             'silhouette', 'mean_purity', 'retention',
-                                                             'min_cluster_size', 'mean_cluster_size', 'max_cluster_size']])
-
-        print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-              + f'{jobid}/{unique_filename}/' \
-                'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
+    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+    #       + f'{jobid}/{unique_filename}/' \
+    #         'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the latent vector and predicted clusters in .csv format.')
+    #
+    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+    #       + f'{jobid}/{unique_filename}/' \
+    #         'clusters_summary.csv" target="_blank">here</a>' + ' to download the cluster summary in .csv format.')
+    #
+    # if optimisation_results is not None:
+    #     pd.set_option('display.max_columns', 30)
+    #     pd.set_option('display.max_rows', 101)
+    #     print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
+    #           "A total of 500 points are tested, showing only 50 points centered around the best solution."
+    #           "\nthe 'best' column denotes the best silhouette solution.\n")
+    #     best_index = optimisation_results.query('best').index
+    #     min_index = max(0, (best_index - 25).item())
+    #     max_index = min((best_index + 25).item(), 500)
+    #     print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singleton',
+    #                                                          'silhouette', 'mean_purity', 'retention',
+    #                                                          'min_cluster_size', 'mean_cluster_size', 'max_cluster_size']])
+    #
+    #     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+    #           + f'{jobid}/{unique_filename}/' \
+    #             'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
