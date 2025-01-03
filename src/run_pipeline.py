@@ -98,20 +98,22 @@ def main():
     args['device'] = 'cpu'
     outdir = os.path.join(args['outdir'], unique_filename) + '/'
     mkdirs(outdir)
-
+    print('Made outdir')
     # dumping args to file
     with open(f'{outdir}args_{unique_filename}.txt', 'w') as file:
         for key, value in args.items():
             file.write(f"{key}: {value}\n")
-
+    print('Saved args')
     # TODO HERE make sure columns etc are correct (ex A/B3 doesn't contain starting C/F etc.
     try:
         df = pd.read_csv(args['file'])
     except:
         print('Couldn\'t read file')
         sys.exit(1)
+    print('Read file')
     # TODO : Hardcoded path or something server specific but the main directory would be in engine/src/tools/etc/models/
     # --> create directory structure to have each model saved in a separate folder and make loading easy
+    srcpath = '/tools'
     model_paths = {'OSNOTRP': {'pt': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni.pt',
                                'json': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni_JSON_kwargs.json'},
                    'OSCSTRP': {'pt': '../models/OneStage_CosTriplet_ER8wJ/checkpoint_best_OneStage_CosTriplet_ER8wJ.pt',
@@ -125,7 +127,7 @@ def main():
     assert args['model'] in model_paths.keys(), f"model provided is {args['model']} and is not in the keys of the dict!"
     model_paths = model_paths[args['model']]
     model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=True)
-
+    print('Loaded model')
     # TODO: Handle input with or without header ?_?
     index_col = args['index_col']
     label_col = args['label_col']
@@ -140,6 +142,7 @@ def main():
 
     # TODO : Merge latent df back to predicted cluster df
     latent_df = get_latent_df(model, df)
+    print('Got latent')
 
     # Here, if indices are not provided, we give it a random index column to not have to change all the code
     if index_col is None or index_col == '' or index_col not in latent_df.columns:
@@ -165,17 +168,20 @@ def main():
                                                                                                          args[
                                                                                                              'low_memory'])
 
+    print('Got dist matrix')
     if args['threshold'] is None or args['threshold'] == "None":
         print('\nOptim\n')
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
                                                     args['n_points'], args['min_purity'], args['min_size'], 'micro',
                                                     args['n_jobs'])
+        print('Got optim')
         optimisation_results['best'] = False
         optimisation_results.loc[
             optimisation_results.iloc[:int(0.8 * len(optimisation_results))]['silhouette'].idxmax(), 'best'] = True
         plot_sprm(optimisation_results, fn=f'{outdir}{unique_filename}optimisation_curves', random_label=random_label)
         threshold = optimisation_results.query('best')['threshold'].item()
         optimisation_results.to_csv(f'{outdir}{unique_filename}optimisation_results_df.csv')
+        print('saved optim')
     else:
         threshold = float(args['threshold'])
         optimisation_results = None
@@ -185,6 +191,7 @@ def main():
                                                      min_purity=args['min_purity'], min_size=args['min_size'],
                                                      silhouette_aggregation='micro',
                                                      return_df_and_c=True)
+    print('Done single threshold')
     # Assigning labels and saving
     dist_matrix['cluster_label'] = c.labels_
     if random_label:
@@ -193,6 +200,7 @@ def main():
     dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
+    print('Merged dfs')
     clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
     end = dt.now()
