@@ -115,7 +115,7 @@ chmod 755 $TMP
 
 # Make this
 mkdir -p ${TMP}
-chmod 755 $TMP
+chmod 777 $TMP
 mkdir -p /tmp/${JOBID} # ??
 
 cd ${SRCDIR}
@@ -137,4 +137,4 @@ echo "THRESHOLD: $THRESHOLD"
 echo "TMP: $TMP"
 cat $FILENAME
 
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 60 -n_jobs 10 # > "${TMP}pylogs" 2>&1
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 60 -n_jobs 10 > "${TMP}pylogs.log" 2>&1

@@ -114,7 +114,7 @@ def main():
     print('Read file')
     # TODO : Hardcoded path or something server specific but the main directory would be in engine/src/tools/etc/models/
     # --> create directory structure to have each model saved in a separate folder and make loading easy
-    srcpath = '/tools'
+    # srcpath = '/tools'
     model_paths = {'OSNOTRP': {'pt': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni.pt',
                                'json': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni_JSON_kwargs.json'},
                    'OSCSTRP': {'pt': '../models/OneStage_CosTriplet_ER8wJ/checkpoint_best_OneStage_CosTriplet_ER8wJ.pt',
@@ -127,7 +127,7 @@ def main():
                        'json': '../models/TwoStage_CosTriplet_jyGpd/checkpoint_best_TwoStage_CosTriplet_jyGpd_JSON_kwargs.json'}}
     assert args['model'] in model_paths.keys(), f"model provided is {args['model']} and is not in the keys of the dict!"
     model_paths = model_paths[args['model']]
-    model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=True)
+    model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=False)
     print('Loaded model')
     # TODO: Handle input with or without header ?_?
     index_col = args['index_col']
