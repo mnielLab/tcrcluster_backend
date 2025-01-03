@@ -222,8 +222,9 @@ if __name__ == '__main__':
         best_index = optimisation_results.query('best').index
         min_index = max(0, (best_index - 15).item())
         max_index = min((best_index + 15).item(), 500)
-        optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size', 'max_cluster_size']] = optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
-        optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].astype(int)
+        optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']] = optimisation_results[
+            ['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
+        optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].round(0)
 
         print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singletons',
                                                              'silhouette', 'mean_purity', 'retention',
