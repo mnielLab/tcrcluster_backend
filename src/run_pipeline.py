@@ -69,9 +69,9 @@ def args_parser():
 
 def main():
     print('\nStarting run_pipeline.py\n')
-    ev = dict(os.environ)
-    for k,v in ev.items():
-        print(f'{k}: {v}')
+    # ev = dict(os.environ)
+    # for k,v in ev.items():
+    #     print(f'{k}: {v}')
     start = dt.now()
     sns.set_style('darkgrid')
     args = vars(args_parser())
