@@ -18,8 +18,6 @@ from networkx_utils import *
 from torch_utils import load_model_full
 from utils import str2bool, make_jobid_filename, pkl_dump
 from datetime import datetime as dt
-print(src_path, '\n')
-print(sys.path, '\n')
 
 
 def args_parser():
@@ -80,7 +78,6 @@ def main():
     #        For debugging purpouses, here use '../tmp/' so that uniquefilename doesn't use it
     print(args)
     unique_filename, rid, connector = make_jobid_filename(args)
-    print('Got jobid etc')
     # run_name = f'{run_dt}_{run_tag}_{run_id}'
     # outdir = os.path.join(args['outdir'], f'{run_name}/')
     # mkdirs(outdir)
@@ -99,19 +96,16 @@ def main():
     outdir = os.path.join(args['outdir'], unique_filename) + '/'
     print(outdir)
     mkdirs(outdir)
-    print('Made outdir')
     # dumping args to file
     with open(f'{outdir}args_{unique_filename}.txt', 'w') as file:
         for key, value in args.items():
             file.write(f"{key}: {value}\n")
-    print('Saved args')
     # TODO HERE make sure columns etc are correct (ex A/B3 doesn't contain starting C/F etc.
     try:
         df = pd.read_csv(args['file'])
     except:
         print('Couldn\'t read file')
         sys.exit(1)
-    print('Read file')
     # TODO : Hardcoded path or something server specific but the main directory would be in engine/src/tools/etc/models/
     # --> create directory structure to have each model saved in a separate folder and make loading easy
     # srcpath = '/tools'
@@ -143,7 +137,6 @@ def main():
 
     # TODO : Merge latent df back to predicted cluster df
     latent_df = get_latent_df(model, df)
-    print('Got latent')
 
     # Here, if indices are not provided, we give it a random index column to not have to change all the code
     if index_col is None or index_col == '' or index_col not in latent_df.columns:
@@ -168,7 +161,6 @@ def main():
                                                                                                          rest_cols,
                                                                                                          args[
                                                                                                              'low_memory'])
-    print('Got dist matrix')
     dist_array = dist_matrix.iloc[:len(dist_matrix), :len(dist_matrix)].values
     c = AgglomerativeClustering(n_clusters=None, metric='precomputed')
     if args['threshold'] is None or args['threshold'] == "None":

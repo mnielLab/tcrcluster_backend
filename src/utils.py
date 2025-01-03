@@ -47,9 +47,7 @@ def make_jobid_filename(args):
     connector = '' if args["out"] == '' else '_'
     rid = args['job_id'] if (args['job_id'] is not None and args['job_id'] != '') \
         else get_random_id() if (args['job_id'] == '' or args['job_id'] is None) else args['job_id']
-    print(rid)
     unique_filename = f'{args["out"]}{connector}{get_datetime_string()}_{rid}'
-    print(unique_filename)
     return unique_filename, rid, connector
 
 
