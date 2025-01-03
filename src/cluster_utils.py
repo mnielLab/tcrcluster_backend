@@ -1233,7 +1233,7 @@ def get_purity_mixity_coherence(cluster_label: int,
     purity = get_purity(counts)
     # mixity = get_mixity(counts)
     # index the distance matrix and return the mean distance within this cluster (i.e. coherence)
-    coherence = get_coherence(dist_array[indices][:, indices])
+    coherence = 0#get_coherence(dist_array[indices][:, indices])
 
     # return purity, mixity, coherence, cluster_size, cluster_size / len(true_labels)
     return {'purity': purity, 'coherence': coherence, 'cluster_size': cluster_size, 'majority_label': majority_label}
