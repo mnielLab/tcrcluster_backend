@@ -1,10 +1,16 @@
 import argparse
 from tqdm.auto import tqdm
 import os, sys
-
-module_path = os.path.abspath(os.path.join('..'))
+module_path = os.path.abspath(os.path.join('../..'))
 if module_path not in sys.path:
     sys.path.append(module_path)
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/'
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+# Get the absolute path of the "src" directory and HARDCODEDDLY ADDING IT
+src_path = '/home/local/tools/src/TCRcluster-1.0/src/'
+# Add the "src" directory to the Python module search path
+sys.path.append(src_path)
 import pandas as pd
 import seaborn as sns
 from cluster_utils import *
