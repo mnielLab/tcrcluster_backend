@@ -109,10 +109,10 @@ SRCDIR="${USERDIR}/src/"
 DATADIR="${USERDIR}/data/"
 
 # Use this as TMP dir for the webserver
-TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
-chmod 755 $TMP
+#TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
 # TODO : THIS IS FOR COMMANDLINE DEBUG ONLY
-#TMP="${USERDIR}/tmp/${JOBID}/"
+TMP="${USERDIR}/tmp/${JOBID}/"
+chmod 755 $TMP
 
 # Make this
 mkdir -p ${TMP}
