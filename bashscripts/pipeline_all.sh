@@ -123,8 +123,8 @@ cd ${SRCDIR}
 chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
 chmod 755 $SRCDIR
 # Call the Python script with the correctly set threshold
-#PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
-PYTHON=/home/people/riwa/anaconda3/envs/cuda/bin/python3.11
+PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
+#PYTHON=/home/people/riwa/anaconda3/envs/cuda/bin/python3.11
 # todo: DEBUG with -np 10, njob 5 ; when done, remove
 echo "Starting python script in $(pwd)"
 # Debugging (Optional: Print variables to check values)
