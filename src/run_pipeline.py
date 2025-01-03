@@ -97,17 +97,23 @@ def main():
             file.write(f"{key}: {value}\n")
 
     # TODO HERE make sure columns etc are correct (ex A/B3 doesn't contain starting C/F etc.
-    df = pd.read_csv(args['file'])
+    try:
+        df = pd.read_csv(args['file'])
+    except:
+        print('Couldn\'t read file')
+        sys.exit(1)
     # TODO : Hardcoded path or something server specific but the main directory would be in engine/src/tools/etc/models/
     # --> create directory structure to have each model saved in a separate folder and make loading easy
     model_paths = {'OSNOTRP': {'pt': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni.pt',
                                'json': '../models/OneStage_NoTriplet_6omni/checkpoint_best_OneStage_NoTriplet_6omni_JSON_kwargs.json'},
                    'OSCSTRP': {'pt': '../models/OneStage_CosTriplet_ER8wJ/checkpoint_best_OneStage_CosTriplet_ER8wJ.pt',
-                               'json':'../models/OneStage_CosTriplet_ER8wJ/checkpoint_best_OneStage_CosTriplet_ER8wJ_JSON_kwargs.json'},
-                   'TSNOTRP': {'pt': '../models/TwoStage_NoTriplet_N1jMC/epoch_4500_interval_checkpoint_TwoStage_NoTriplet_N1jMC.pt',
-                               'json': '../models/TwoStage_NoTriplet_N1jMC/checkpoint_best_TwoStage_NoTriplet_N1jMC_JSON_kwargs.json'},
-                   'TSCSTRP': {'pt': '../models/TwoStage_CosTriplet_jyGpd/epoch_4500_interval_checkpoint_TwoStage_CosTriplet_jyGpd.pt',
-                               'json': '../models/TwoStage_CosTriplet_jyGpd/checkpoint_best_TwoStage_CosTriplet_jyGpd_JSON_kwargs.json'}}
+                               'json': '../models/OneStage_CosTriplet_ER8wJ/checkpoint_best_OneStage_CosTriplet_ER8wJ_JSON_kwargs.json'},
+                   'TSNOTRP': {
+                       'pt': '../models/TwoStage_NoTriplet_N1jMC/epoch_4500_interval_checkpoint_TwoStage_NoTriplet_N1jMC.pt',
+                       'json': '../models/TwoStage_NoTriplet_N1jMC/checkpoint_best_TwoStage_NoTriplet_N1jMC_JSON_kwargs.json'},
+                   'TSCSTRP': {
+                       'pt': '../models/TwoStage_CosTriplet_jyGpd/epoch_4500_interval_checkpoint_TwoStage_CosTriplet_jyGpd.pt',
+                       'json': '../models/TwoStage_CosTriplet_jyGpd/checkpoint_best_TwoStage_CosTriplet_jyGpd_JSON_kwargs.json'}}
     assert args['model'] in model_paths.keys(), f"model provided is {args['model']} and is not in the keys of the dict!"
     model_paths = model_paths[args['model']]
     model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=True)
@@ -116,7 +122,7 @@ def main():
     index_col = args['index_col']
     label_col = args['label_col']
     # rest_cols = args['rest_cols']
-    rest_cols = [x for x in df.columns if x not in ['A1','A2','A3','B1','B2','B3','label']]
+    rest_cols = [x for x in df.columns if x not in ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'label']]
 
     # # TODO : phase this out ;
     # weight_col = args['weight_col']
@@ -164,11 +170,11 @@ def main():
         optimisation_results.to_csv(f'{outdir}{unique_filename}optimisation_results_df.csv')
     else:
         threshold = float(args['threshold'])
-
+        optimisation_results = None
     print('\nSingle threshold\n')
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
                                                      label_encoder, threshold,
-                                                     min_purity = args['min_purity'], min_size=args['min_size'],
+                                                     min_purity=args['min_purity'], min_size=args['min_size'],
                                                      silhouette_aggregation='micro',
                                                      return_df_and_c=True)
     # Assigning labels and saving
@@ -179,14 +185,38 @@ def main():
     dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
-    clusters_df.to_csv(f'{outdir}{unique_filename}clusters_summary.csv', index=False)
-    results_df.to_csv(f'{outdir}{unique_filename}TCRcluster_results.csv', index=False)
+    clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
+    results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
     end = dt.now()
     elapsed = divmod((end - start).seconds, 60)
     print(f'Finished in {elapsed[0]} minutes, {elapsed[1]} seconds.')
+    return results_df, clusters_df, optimisation_results, unique_filename, jobid
 
 
 if __name__ == '__main__':
-    # TODO : Need to change this so that the results are downloadable
-    #
-    main()
+    # TODO : Check the tmp output path and make this downloadable
+    results_df, clusters_df, optimisation_results, unique_filename, jobid = main()
+    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+          + f'{jobid}/{unique_filename}/' \
+            'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the latent vector and predicted clusters in .csv format.')
+
+    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+          + f'{jobid}/{unique_filename}/' \
+            'clusters_summary.csv" target="_blank">here</a>' + ' to download the cluster summary in .csv format.')
+
+    if optimisation_results is not None:
+        pd.set_option('display.max_columns', 30)
+        pd.set_option('display.max_rows', 101)
+        print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
+              "A total of 500 points are tested, showing only 50 points centered around the best solution."
+              "\nthe 'best' column denotes the best silhouette solution.\n")
+        best_index = optimisation_results.query('best').index
+        min_index = max(0, (best_index - 25).item())
+        max_index = min((best_index + 25).item(), 500)
+        print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singleton',
+                                                             'silhouette', 'mean_purity', 'retention',
+                                                             'min_cluster_size', 'mean_cluster_size', 'max_cluster_size']])
+
+        print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+              + f'{jobid}/{unique_filename}/' \
+                'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')

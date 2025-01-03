@@ -118,13 +118,13 @@ DATADIR="${USERDIR}/data/"
 
 # Use this as TMP dir for the webserver
 TMP=${WWWROOT}${SERVICEPATH}/tmp/${JOBID}/
+chmod 755 $TMP
 # TODO : THIS IS FOR COMMANDLINE DEBUG ONLY
 #TMP="${USERDIR}/tmp/${JOBID}/"
 
 # Make this
 mkdir -p ${TMP}
 mkdir -p /tmp/${JOBID} # ??
-chmod 755 $TMP
 
 cd ${SRCDIR}
 # TODO : check the arguments and change everything accordingly
@@ -132,5 +132,4 @@ chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
 # Call the Python script with the correctly set threshold
 PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
 # todo: DEBUG with -np 10, njob 5 ; when done, remove
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" n_jobs 20 # -np 10 -n_jobs 5
-# > "${TMP}pylogs" 2>&1
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 60 -n_jobs 10 > "${TMP}pylogs" 2>&1
