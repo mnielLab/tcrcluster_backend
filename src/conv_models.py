@@ -45,7 +45,7 @@ class CNNDecoder(NetParent):
         self.hidden_dim = hidden_dim
         self.latent_dim = latent_dim
         bn = nn.BatchNorm1d if batchnorm else nn.Identity
-        print(bn, hidden_dim, kernel_size, stride, pad, output_padding_1, output_padding_2, activation)
+        # print(bn, hidden_dim, kernel_size, stride, pad, output_padding_1, output_padding_2, activation)
         self.conv_transpose_layers = nn.Sequential(nn.ConvTranspose1d(hidden_dim*2, hidden_dim, kernel_size, stride, pad, output_padding_1), nn.SELU(), bn(hidden_dim),
                                                    nn.ConvTranspose1d(hidden_dim, features_dim, kernel_size, stride, pad, output_padding_2), nn.SELU(), bn(features_dim))
         self.fc_z = nn.Linear(latent_dim, len_in * 2 * hidden_dim)

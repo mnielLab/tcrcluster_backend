@@ -165,11 +165,11 @@ def main():
         optimisation_results['best'] = False
         optimisation_results.loc[
             optimisation_results.iloc[:int(0.8 * len(optimisation_results))]['silhouette'].idxmax(), 'best'] = True
-        plot_sprm(optimisation_results, fn=f'{outdir}{unique_filename}optimisation_curves', random_label=random_label)
+        plot_sprm(optimisation_results, fn=f'{outdir}optimisation_curves', random_label=random_label)
         threshold = optimisation_results.query('best')['threshold'].item()
         optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']] = optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
         optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].round(0)
-        optimisation_results.to_csv(f'{outdir}{unique_filename}optimisation_results_df.csv')
+        optimisation_results.to_csv(f'{outdir}optimisation_results_df.csv')
         # print('saved optim')
     else:
         threshold = float(args['threshold'])
@@ -201,6 +201,7 @@ def main():
 if __name__ == '__main__':
     # TODO : Check the tmp output path and make this downloadable
     results_df, clusters_df, optimisation_results, unique_filename, jobid = main()
+    print('\n\n')
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
             'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the latent vector and predicted clusters in .csv format.')
@@ -215,6 +216,9 @@ if __name__ == '__main__':
         print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
               + f'{jobid}/{unique_filename}/' \
                 'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
+        print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+              + f'{jobid}/{unique_filename}/' \
+                'optimisation_curves.png" target="_blank">here</a>' + ' to download the optimisation curve plot in .png format.')
 
         print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
               "A total of 300 points are tested, showing only 30 points centered around the best solution."
