@@ -215,12 +215,15 @@ if __name__ == '__main__':
         print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
               + f'{jobid}/{unique_filename}/' \
                 'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
+
         print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
               "A total of 500 points are tested, showing only 30 points centered around the best solution."
               "\nthe 'best' column denotes the best silhouette solution.\n")
         best_index = optimisation_results.query('best').index
         min_index = max(0, (best_index - 15).item())
         max_index = min((best_index + 15).item(), 500)
+        optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size', 'max_cluster_size']] = optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
+        optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].astype(int)
 
         print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singletons',
                                                              'silhouette', 'mean_purity', 'retention',
