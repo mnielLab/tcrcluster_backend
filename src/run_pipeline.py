@@ -69,6 +69,9 @@ def args_parser():
 
 def main():
     print('\nStarting run_pipeline.py\n')
+    ev = dict(os.environ)
+    for k,v in ev.items():
+        print(f'{k}: {v}')
     start = dt.now()
     sns.set_style('darkgrid')
     args = vars(args_parser())
@@ -78,20 +81,7 @@ def main():
     #        For debugging purpouses, here use '../tmp/' so that uniquefilename doesn't use it
     print(args)
     unique_filename, rid, connector = make_jobid_filename(args)
-    # run_name = f'{run_dt}_{run_tag}_{run_id}'
-    # outdir = os.path.join(args['outdir'], f'{run_name}/')
-    # mkdirs(outdir)
-    # jobid = str(args['jobid'])
 
-    # TODO: HERE NEED TO CHANGE OUTDIR
-    # checkpoint_filename = f'checkpoint_best_{unique_filename}.pt'
-    # if args['outdir'] is not None:
-    #     outdir = os.path.join(outdir, args['outdir'])
-    #     if not outdir.endswith('/'):
-    #         outdir = outdir + '/'
-    # Here this is commented because we handle the uniquefilename creation already
-    # in the overall bash script
-    # TODO : These things here need to change for a Webserver
     args['device'] = 'cpu'
     outdir = os.path.join(args['outdir'], unique_filename) + '/'
     print(outdir)
