@@ -180,10 +180,6 @@ def main():
     # print('Done single threshold')
     # Assigning labels and saving
     dist_matrix['cluster_label'] = c.labels_
-    if random_label:
-        clusters_df.drop(columns=[label_col], inplace=True)
-    # print('\nSaving\n')
-    dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
     # print('Merged dfs')
