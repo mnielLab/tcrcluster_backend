@@ -4,3 +4,5 @@
 .DS_Store
 models/.DS_Store
 src/.DS_Store
+/tcrcluster_tmp/
+/tmp/
