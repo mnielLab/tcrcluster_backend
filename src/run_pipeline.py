@@ -152,10 +152,7 @@ def main():
                                                                                                          args[
                                                                                                              'low_memory'])
     dist_array = dist_matrix.iloc[:len(dist_matrix), :len(dist_matrix)].values
-    try:
-        c = AgglomerativeClustering(n_clusters=None, metric='precomputed')
-    except:
-        c = AgglomerativeClustering(n_clusters=None, affinity='precomputed')
+    dist_matrix.to_csv(f'{outdir}cosine_distance_matrix.csv')
     if args['threshold'] is None or args['threshold'] == "None":
         # print('\nOptim\n')
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
@@ -192,9 +189,6 @@ def main():
     # print('Merged dfs')
     clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
-    end = dt.now()
-    elapsed = divmod((end - start).seconds, 60)
-    # print(f'Finished in {elapsed[0]} minutes, {elapsed[1]} seconds.')
     return results_df, clusters_df, optimisation_results, unique_filename, jobid
 
 
@@ -209,6 +203,10 @@ if __name__ == '__main__':
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
             'clusters_summary.csv" target="_blank">here</a>' + ' to download the clusters summary in .csv format.')
+
+    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+          + f'{jobid}/{unique_filename}/' \
+            'cosine_distance_matrix.csv" target="_blank">here</a>' + ' to download the cosine distance matrix in .csv format.')
 
     if optimisation_results is not None:
         pd.set_option('display.max_columns', 30)
