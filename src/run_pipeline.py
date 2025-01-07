@@ -145,8 +145,8 @@ def main():
         rest_cols.append(label_col)
 
     # Trying something here...
-    if 300 > len(latent_df)//3 >= 4*len(latent_df):
-        args['n_points'] = max(4*len(latent_df), len(latent_df)//3)
+    if 300 > len(latent_df)//3 and 4*len(latent_df) < 300:
+        args['n_points'] = max(50, max(4*len(latent_df), len(latent_df)//3))
     else:
         args['n_points'] = len(latent_df)//3
 
