@@ -144,6 +144,12 @@ def main():
         latent_df[label_col] = np.random.choice(labels, (len(latent_df)), replace=True)
         rest_cols.append(label_col)
 
+    # Trying something here...
+    if 300 > len(latent_df)//3 >= 4*len(latent_df):
+        args['n_points'] = max(4*len(latent_df), len(latent_df)//3)
+    else:
+        args['n_points'] = len(latent_df)//3
+
     dist_matrix, dist_array, _, labels, encoded_labels, label_encoder = get_distances_labels_from_latent(latent_df,
                                                                                                          label_col,
                                                                                                          seq_cols,
@@ -185,12 +191,12 @@ def main():
     # print('Merged dfs')
     clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
-    return results_df, clusters_df, optimisation_results, unique_filename, jobid
+    return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
 
 
 if __name__ == '__main__':
     # TODO : Check the tmp output path and make this downloadable
-    results_df, clusters_df, optimisation_results, unique_filename, jobid = main()
+    results_df, clusters_df, optimisation_results, unique_filename, jobid, args = main()
     print('\n\n')
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
@@ -215,11 +221,11 @@ if __name__ == '__main__':
                 'optimisation_curves.png" target="_blank">here</a>' + ' to download the optimisation curve plot in .png format.')
 
         print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
-              "A total of 300 points are tested, showing only 30 points centered around the best solution."
+              f"A total of {args['n_points']} points are tested, showing only 10 points centered around the best solution."
               "\nthe 'best' column denotes the best silhouette solution.\n")
         best_index = optimisation_results.query('best').index
-        min_index = max(0, (best_index - 15).item())
-        max_index = min((best_index + 15).item(), 500)
+        min_index = max(0, (best_index - 10).item())
+        max_index = min((best_index + 10).item(), 500)
         optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']] = optimisation_results[
             ['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
         optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].round(0)

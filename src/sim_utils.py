@@ -42,8 +42,8 @@ def make_dist_matrix(df, label_col='peptide',
     # Getting dist matrix
     zcols = [z for z in df.columns if z.startswith("z_")]
     zs = torch.from_numpy(df[zcols].values)
-    dist_matrix = pd.DataFrame(compute_cosine_distance(zs),
-                               columns=seqs, index=seqs)
+    dist_matrix = pd.DataFrame(compute_cosine_distance(zs).numpy(),
+                               columns=seqs, index=seqs).astype(float)
     # dist_matrix = pd.merge(dist_matrix, df.set_index('seq')[list(cols)],
     #                        left_index=True, right_index=True).drop_duplicates()  # .rename(columns={label_col: 'label'})
     if low_memory:
