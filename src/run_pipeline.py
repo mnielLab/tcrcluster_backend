@@ -226,7 +226,7 @@ if __name__ == '__main__':
 
     print(f'<p>Below is a complete-linkage sorted cosine distance heatmap:</p>')
     print(
-        f'<img src="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/{jobid}/{unique_filename}/complete_cosine_sorted_heatmap.png" alt="Cosine sorted heatmap" style="max-width:100%; height:auto;">')
+        f'<img src="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/{jobid}/{unique_filename}/complete_cosine_sorted_heatmap.png" alt="Cosine sorted heatmap" style="max-width:33%; height:auto;">')
 
     if optimisation_results is not None:
         pd.set_option('display.max_columns', 30)
