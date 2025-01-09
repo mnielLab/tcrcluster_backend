@@ -9,6 +9,19 @@ import secrets
 import string
 import torch
 from datetime import datetime as dt
+from scipy.cluster.hierarchy import linkage, leaves_list
+
+
+def get_linkage_sorted_dm(dist_matrix, method='complete', metric='cosine', optimal_ordering=True):
+    rest_cols = [x for x in dist_matrix.columns if x not in dist_matrix.index]
+    dist_array = dist_matrix.iloc[:len(dist_matrix), :len(dist_matrix)].values
+    linkage_matrix = linkage(dist_array, method=method, metric=metric,
+                             optimal_ordering=optimal_ordering)  # Use your preferred method (e.g., 'ward', 'average')
+    dendrogram_order = leaves_list(linkage_matrix)  # Get the order of rows/columns
+    sorted_dm = dist_matrix.iloc[dendrogram_order]
+    sorted_da = dist_matrix.iloc[dendrogram_order, dendrogram_order].values
+    sorted_dm = sorted_dm[sorted_dm.index.to_list() + rest_cols]
+    return sorted_dm, sorted_da
 
 
 def batchify(data, batch_size):
@@ -90,7 +103,7 @@ def plot_criterion_annealing(n_epochs, criterion, xlim=0.9):
                label=f'>1e-4 at {last_1m4}')
 
     p50 = torch.where(y >= .5 * base_weight)[0][0].item()
-    print('wtf', p50, 0.5*base_weight, base_weight)
+    print('wtf', p50, 0.5 * base_weight, base_weight)
     ax.axvline(p50, c='m', ls=':', lw=0.5,
                label=f'50% at {p50}')
     p25 = torch.where(y >= .25 * base_weight)[0][0].item()
@@ -284,8 +297,6 @@ def make_chunks(iterable, chunk_size):
     return (iterable[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(chunk_size))
 
 
-
-
 def get_palette(palette, n_colors):
     """ 'stretches' stupid fucking palette to have more contrast"""
     if n_colors == 2:
@@ -314,8 +325,8 @@ def add_median_labels(ax, fmt='.1%', fontweight='bold', fontsize=12):
     for median in lines[4:len(lines):lines_per_box]:
         x, y = (data.mean() for data in median.get_data())
         # manual override for multiple axes if for this particular case of tbcr align boxplot
-        if y == 0  and x==3.8:
-            y=1
+        if y == 0 and x == 3.8:
+            y = 1
         # choose value depending on horizontal or vertical plot orientation
         value = x if (median.get_xdata()[1] - median.get_xdata()[0]) == 0 else y
         text = ax.text(x, y, f'{value:{fmt}}', ha='center', va='center',

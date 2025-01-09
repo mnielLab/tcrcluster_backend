@@ -16,7 +16,7 @@ import seaborn as sns
 from cluster_utils import *
 from networkx_utils import *
 from torch_utils import load_model_full
-from utils import str2bool, make_jobid_filename, pkl_dump
+from utils import str2bool, make_jobid_filename, get_linkage_sorted_dm
 from datetime import datetime as dt
 
 
@@ -130,7 +130,10 @@ def main():
 
     # Here, if indices are not provided, we give it a random index column to not have to change all the code
     if index_col is None or index_col == '' or index_col not in latent_df.columns:
+        latent_df.reset_index(inplace=True)
+        latent_df.rename(columns={'index':'original_input_order'}, inplace=True)
         index_col = 'index_col'
+        rest_cols.extend([index_col, 'original_input_order'])
         latent_df[index_col] = [f'seq_{i:04}' for i in range(len(latent_df))]
 
     seq_cols = ('A1', 'A2', 'A3', 'B1', 'B2', 'B3')
@@ -158,7 +161,10 @@ def main():
                                                                                                          args[
                                                                                                              'low_memory'])
     dist_array = dist_matrix.iloc[:len(dist_matrix), :len(dist_matrix)].values
-    dist_matrix.to_csv(f'{outdir}cosine_distance_matrix.csv')
+
+    # TODO : Nice to have but not required
+    # TODO : MAKE A SORTED DIST MATRIX SOMEHOW
+    #        MAKE A HEATMAP PLOT FOR VIZ
     if args['threshold'] is None or args['threshold'] == "None":
         # print('\nOptim\n')
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
@@ -190,7 +196,15 @@ def main():
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
     # print('Merged dfs')
     clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
+    # Here now sort DF / results + plot heatmap
+    sorted_dm, sorted_da = get_linkage_sorted_dm(dist_matrix, 'complete', 'cosine', True)
+    sorted_dm.to_csv(f'{outdir}sorted_cosine_distance_matrix.csv')
+    fig, ax = plt.subplots(1,1, figsize=(9,9))
+    sns.heatmap(sorted_da, ax=ax, square=True, cmap='viridis', xticklabels=False, yticklabels=False)
+    results_df = results_df.set_index(index_col).loc[sorted_dm[index_col]].reset_index()
+    fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
+
     return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
 
 
@@ -210,6 +224,10 @@ if __name__ == '__main__':
           + f'{jobid}/{unique_filename}/' \
             'cosine_distance_matrix.csv" target="_blank">here</a>' + ' to download the cosine distance matrix in .csv format.')
 
+    print(f'<p>Below is a complete-linkage sorted cosine distance heatmap:</p>')
+    print(
+        f'<img src="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/{jobid}/{unique_filename}/complete_cosine_sorted_heatmap.png" alt="Cosine sorted heatmap" style="max-width:100%; height:auto;">')
+
     if optimisation_results is not None:
         pd.set_option('display.max_columns', 30)
         pd.set_option('display.max_rows', 101)
@@ -219,7 +237,6 @@ if __name__ == '__main__':
         print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
               + f'{jobid}/{unique_filename}/' \
                 'optimisation_curves.png" target="_blank">here</a>' + ' to download the optimisation curve plot in .png format.')
-
         print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
               f"A total of {args['n_points']} points are tested, showing only 10 points centered around the best solution."
               "\nthe 'best' column denotes the best silhouette solution.\n")
