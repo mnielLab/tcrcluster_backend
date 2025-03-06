@@ -222,7 +222,7 @@ if __name__ == '__main__':
 
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
-            'cosine_distance_matrix.csv" target="_blank">here</a>' + ' to download the cosine distance matrix in .csv format.')
+            'sorted_cosine_distance_matrix.csv" target="_blank">here</a>' + ' to download the cosine distance matrix in .csv format.')
 
     print(f'<p>Below is a complete-linkage sorted cosine distance heatmap:</p>')
     print(
