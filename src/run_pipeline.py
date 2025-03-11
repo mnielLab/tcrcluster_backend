@@ -19,6 +19,9 @@ from torch_utils import load_model_full
 from utils import str2bool, make_jobid_filename, get_linkage_sorted_dm
 from datetime import datetime as dt
 import shutil
+import os
+import zipfile
+
 
 def args_parser():
     parser = argparse.ArgumentParser(description='Script to train and evaluate a VAE model with all chains')
@@ -204,11 +207,22 @@ def main():
     results_df = results_df.set_index(index_col).loc[sorted_dm[index_col]].reset_index()
     fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
-    #
+
+
     dir_path = f'{outdir}'
-    output_zip = f'{outdir}TCRcluster_outputs'
+    output_zip = f'{outdir}TCRcluster_outputs.zip'
     # Create a zip archive of the entire directory
-    shutil.make_archive(output_zip, 'zip', dir_path, dir_path)
+
+    with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for item in os.listdir(dir_path):
+            # Exclude the zip file itself
+            if item.endswith('.zip'):
+                continue
+            file_path = os.path.join(dir_path, item)
+            if os.path.isfile(file_path):
+                zipf.write(file_path, arcname=item)
+
+    print("Directory zipped successfully!")
 
     # print("Directory zipped successfully!")
 
