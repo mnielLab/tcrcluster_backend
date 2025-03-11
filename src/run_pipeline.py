@@ -204,11 +204,11 @@ def main():
     results_df = results_df.set_index(index_col).loc[sorted_dm[index_col]].reset_index()
     fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
-
-    dir_path = f'{outdir}'
-    output_zip = f'{outdir}TCRcluster_outputs'
-    # Create a zip archive of the entire directory
-    shutil.make_archive(output_zip, 'zip', dir_path)
+    #
+    # dir_path = f'{outdir}'
+    # output_zip = f'{outdir}TCRcluster_outputs'
+    # # Create a zip archive of the entire directory
+    # shutil.make_archive(output_zip, 'zip', dir_path)
 
     print("Directory zipped successfully!")
 
@@ -219,9 +219,9 @@ if __name__ == '__main__':
     # TODO : Check the tmp output path and make this downloadable
     results_df, clusters_df, optimisation_results, unique_filename, jobid, args = main()
     print('\n\n')
-    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-          + f'{jobid}/{unique_filename}/' \
-            'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
+    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+    #       + f'{jobid}/{unique_filename}/' \
+    #         'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
 
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
