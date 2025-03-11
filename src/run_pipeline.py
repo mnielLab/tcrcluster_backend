@@ -209,21 +209,19 @@ def main():
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
 
 
-    dir_path = f'{outdir}'
-    output_zip = f'{outdir}TCRcluster_outputs.zip'
-    # Create a zip archive of the entire directory
-
-    with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for item in os.listdir(dir_path):
-            # Exclude the zip file itself
-            if item.endswith('.zip'):
-                continue
-            file_path = os.path.join(dir_path, item)
-            if os.path.isfile(file_path):
-                zipf.write(file_path, arcname=item)
-
-    print("Directory zipped successfully!")
-
+    # dir_path = f'{outdir}'
+    # output_zip = f'{outdir}TCRcluster_outputs.zip'
+    # # Create a zip archive of the entire directory
+    #
+    # with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    #     for item in os.listdir(dir_path):
+    #         # Exclude the zip file itself
+    #         if item.endswith('.zip'):
+    #             continue
+    #         file_path = os.path.join(dir_path, item)
+    #         if os.path.isfile(file_path):
+    #             zipf.write(file_path, arcname=item)
+    #
     # print("Directory zipped successfully!")
 
     return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
@@ -233,9 +231,9 @@ if __name__ == '__main__':
     # TODO : Check the tmp output path and make this downloadable
     results_df, clusters_df, optimisation_results, unique_filename, jobid, args = main()
     print('\n\n')
-    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-          + f'{jobid}/{unique_filename}/' \
-            'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
+    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+    #       + f'{jobid}/{unique_filename}/' \
+    #         'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
 
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
