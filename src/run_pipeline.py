@@ -205,12 +205,12 @@ def main():
     fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
     #
-    # dir_path = f'{outdir}'
-    # output_zip = f'{outdir}TCRcluster_outputs'
-    # # Create a zip archive of the entire directory
-    # shutil.make_archive(output_zip, 'zip', dir_path)
+    dir_path = f'{outdir}'
+    output_zip = f'{outdir}TCRcluster_outputs'
+    # Create a zip archive of the entire directory
+    shutil.make_archive(output_zip, 'zip', dir_path)
 
-    print("Directory zipped successfully!")
+    # print("Directory zipped successfully!")
 
     return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
 
@@ -244,7 +244,7 @@ if __name__ == '__main__':
         pd.set_option('display.max_rows', 101)
         print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
               + f'{jobid}/{unique_filename}/' \
-                'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
+                'optimisation_results_df.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
         print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
               + f'{jobid}/{unique_filename}/' \
                 'optimisation_curves.png" target="_blank">here</a>' + ' to download the optimisation curve plot in .png format.')
