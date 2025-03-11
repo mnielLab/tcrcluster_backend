@@ -208,7 +208,7 @@ def main():
     dir_path = f'{outdir}'
     output_zip = f'{outdir}TCRcluster_outputs'
     # Create a zip archive of the entire directory
-    shutil.make_archive(output_zip, 'zip', dir_path)
+    shutil.make_archive(output_zip, 'zip', dir_path, dir_path)
 
     # print("Directory zipped successfully!")
 
