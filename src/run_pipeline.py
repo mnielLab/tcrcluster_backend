@@ -18,7 +18,7 @@ from networkx_utils import *
 from torch_utils import load_model_full
 from utils import str2bool, make_jobid_filename, get_linkage_sorted_dm
 from datetime import datetime as dt
-
+import shutil
 
 def args_parser():
     parser = argparse.ArgumentParser(description='Script to train and evaluate a VAE model with all chains')
@@ -205,6 +205,13 @@ def main():
     fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
 
+    dir_path = f'{outdir}'
+    output_zip = f'{outdir}TCRcluster_outputs'
+    # Create a zip archive of the entire directory
+    shutil.make_archive(output_zip, 'zip', dir_path)
+
+    print("Directory zipped successfully!")
+
     return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
 
 
@@ -212,6 +219,10 @@ if __name__ == '__main__':
     # TODO : Check the tmp output path and make this downloadable
     results_df, clusters_df, optimisation_results, unique_filename, jobid, args = main()
     print('\n\n')
+    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+          + f'{jobid}/{unique_filename}/' \
+            'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
+
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
             'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the latent vector and predicted clusters in .csv format.')
