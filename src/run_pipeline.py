@@ -219,9 +219,9 @@ if __name__ == '__main__':
     # TODO : Check the tmp output path and make this downloadable
     results_df, clusters_df, optimisation_results, unique_filename, jobid, args = main()
     print('\n\n')
-    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-    #       + f'{jobid}/{unique_filename}/' \
-    #         'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
+    print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
+          + f'{jobid}/{unique_filename}/' \
+            'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
 
     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
           + f'{jobid}/{unique_filename}/' \
