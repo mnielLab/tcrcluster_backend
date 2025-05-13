@@ -121,12 +121,7 @@ def main():
     label_col = args['label_col']
     # rest_cols = args['rest_cols']
     rest_cols = [x for x in df.columns if x not in ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'label']]
-
-    # # TODO : phase this out ;
-    # weight_col = args['weight_col']
-    # if weight_col is not None:
-    #     if weight_col not in rest_cols and weight_col in df.columns:
-    #         rest_cols.append(weight_col)
+    df.drop_duplicates(['A1', 'A2', 'A3', 'B1', 'B2', 'B3'], inplace=True)
 
     # TODO : Merge latent df back to predicted cluster df
     latent_df = get_latent_df(model, df)
