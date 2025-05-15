@@ -208,69 +208,8 @@ def main():
     fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
 
-
-    # dir_path = f'{outdir}'
-    # output_zip = f'{outdir}TCRcluster_outputs.zip'
-    # # Create a zip archive of the entire directory
-    #
-    # with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
-    #     for item in os.listdir(dir_path):
-    #         # Exclude the zip file itself
-    #         if item.endswith('.zip'):
-    #             continue
-    #         file_path = os.path.join(dir_path, item)
-    #         if os.path.isfile(file_path):
-    #             zipf.write(file_path, arcname=item)
-    #
-    # print("Directory zipped successfully!")
-
     return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
 
 
 if __name__ == '__main__':
     results_df, clusters_df, optimisation_results, unique_filename, jobid, args = main()
-    # print('\n\n')
-    # # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-    # #       + f'{jobid}/{unique_filename}/' \
-    # #         'TCRcluster_outputs.zip" target="_blank">here</a>' + ' to download all the outputs in .zip format.')
-    #
-    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-    #       + f'{jobid}/{unique_filename}/' \
-    #         'TCRcluster_results.csv" target="_blank">here</a>' + ' to download the latent vector and predicted clusters in .csv format.')
-    #
-    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-    #       + f'{jobid}/{unique_filename}/' \
-    #         'clusters_summary.csv" target="_blank">here</a>' + ' to download the clusters summary in .csv format.')
-    #
-    # print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-    #       + f'{jobid}/{unique_filename}/' \
-    #         'sorted_cosine_distance_matrix.csv" target="_blank">here</a>' + ' to download the cosine distance matrix in .csv format.')
-    #
-    # print(f'<p>Below is a complete-linkage sorted cosine distance heatmap:</p>')
-    # print(
-    #     f'<img src="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/{jobid}/{unique_filename}/complete_cosine_sorted_heatmap.png" alt="Cosine sorted heatmap" style="max-width:33%; height:auto;">')
-    #
-    # if optimisation_results is not None:
-    #     pd.set_option('display.max_columns', 30)
-    #     pd.set_option('display.max_rows', 101)
-    #     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-    #           + f'{jobid}/{unique_filename}/' \
-    #             'optimisation_results_df.csv" target="_blank">here</a>' + ' to download the optimisation results in .csv format.')
-    #     print('Click ' + '<a href="https://services.healthtech.dtu.dk/services/TCRcluster-1.0/tmp/' \
-    #           + f'{jobid}/{unique_filename}/' \
-    #             'optimisation_curves.png" target="_blank">here</a>' + ' to download the optimisation curve plot in .png format.')
-    #     print("\n \nBelow is a table preview of clustering metrics at each threshold tested.\n"
-    #           f"A total of {args['n_points']} points are tested, showing only 10 points centered around the best solution."
-    #           "\nthe 'best' column denotes the best silhouette solution.\n")
-    #     best_index = optimisation_results.query('best').index
-    #     min_index = max(0, (best_index - 10).item())
-    #     max_index = min((best_index + 10).item(), 500)
-    #     optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']] = optimisation_results[
-    #         ['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
-    #     optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].round(0)
-    #
-    #     print(optimisation_results.loc[min_index:max_index][['threshold', 'best', 'n_cluster', 'n_singletons',
-    #                                                          'silhouette', 'mean_purity', 'retention',
-    #                                                          'mean_cluster_size', 'max_cluster_size']]\
-    #           .rename(columns={'mean_cluster_size':'mean_size', 'max_cluster_size':'max_size'}))
-

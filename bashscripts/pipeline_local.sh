@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# This the main TCRcluster-1.0 script. It acts as the full pipeline, doing the NetMHCpan, KernDist, PepX query, and Python script
-# Yat, Dec 2024
+# This the main TCRcluster-1.0 script.
+# Yat, May 2025
 
 ###############################################################################
 #               GENERAL SETTINGS: CUSTOMIZE TO YOUR SITE
@@ -16,9 +16,9 @@ THRESHOLD=None
 T_VALUE="None"
 MODEL="TSCSTRP"
 N_VALUE=300
-
+N_JOBS=20
 # TODO : This is for command-line script debugging ; Comment this and switch to form submission
-while getopts ":f:j:m:t:v:n:" opt; do
+while getopts ":f:j:m:t:v:n:k:" opt; do
   case ${opt} in
     f )
       FILENAME=$OPTARG
@@ -42,8 +42,13 @@ while getopts ":f:j:m:t:v:n:" opt; do
       # This gives the number of points (number of thresholds to try) to optimize
       N_VALUE=$OPTARG
     ;;
+    k )
+      # This gives the NUMBER OF PARALLEL JOBS FOR THE CLUSTERING
+      N_JOBS=$OPTARG
+    ;;
     \? )
-      echo "Usage: $0 -f <INPUTFILE> -j <JOBID> -m <MODEL> -t <THRESHOLD_TYPE> -v <THRESHOLD_VALUE> -n <n_points>"
+      echo "Usage: $0 -f <INPUTFILE> -j <JOBID> -m <MODEL> -t <THRESHOLD_TYPE> -v <THRESHOLD_VALUE> -n <n_points> -k <N_JOBS>\n-m<MODEL> to choose between OSNOTRP, OSCSTRP, TSNOTRP, TSCSTRP; -t <THRESHOLD_TYPE> to choose between 'custom' or 'None'; -v <THRESHOLD_VALUE> is the actual distance threshold, in float between [0.01, 1.5] that you should input in case you used 'custom' threshold type; -n <N_POINTS> is the number of different thresholds to do in the optimization, 300 by default; -k <N_JOBS> is the number of cores to use in the clustering optimisation process, 20 by default"
+
       exit 1
       ;;
     : )
@@ -71,8 +76,6 @@ fi
 filename=$(basename ${FILENAME})
 basenm="${filename%.*}"
 
-
-PLATFORM="${UNIX}_${AR}"
 USERDIR="/home/projects2/riwa/tcrcluster_backend/"
 BASHDIR="${USERDIR}/bashscripts/"
 SRCDIR="${USERDIR}/src/"
@@ -81,13 +84,10 @@ DATADIR="${USERDIR}/data/"
 # Use this as TMP dir for the webserver
 TMP=${USERDIR}/tmp/${JOBID}/
 # THIS IS FOR COMMANDLINE DEBUG ONLY
-#TMP="${USERDIR}/tmp/${JOBID}/"
-chmod 755 $TMP
 
 # Make this
 mkdir -p ${TMP}
 chmod 777 $TMP
-#mkdir -p /tmp/${JOBID} # ??
 
 cd ${SRCDIR}
 chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
@@ -102,4 +102,6 @@ echo "FILENAME: $FILENAME"
 echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
 echo "THRESHOLD: $THRESHOLD"
 
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np $n -n_jobs 20 > "${TMP}pylogs.log" 2>&1
+$PYTHON pipeline_local.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np $n -n_jobs $k > "${TMP}pylogs.log" 2>&1
+
+chmod 755 "${TMP}/*/*"
