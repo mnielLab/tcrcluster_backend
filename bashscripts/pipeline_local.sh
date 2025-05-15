@@ -90,7 +90,9 @@ mkdir -p ${TMP}
 chmod 755 $TMP
 
 cd ${SRCDIR}
-chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
+chmod 755 $BASHDIR
+chmod 755 $DATADIR
+chmod 755 $USERDIR
 chmod 755 $SRCDIR
 # Call the Python script with the correctly set threshold
 PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
