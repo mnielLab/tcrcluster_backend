@@ -82,7 +82,7 @@ SRCDIR="${USERDIR}/src/"
 DATADIR="${USERDIR}/data/"
 
 # Use this as TMP dir for the webserver
-TMP=${USERDIR}/tmp/${JOBID}/
+TMP=${USERDIR}tmp/${JOBID}/
 # THIS IS FOR COMMANDLINE DEBUG ONLY
 
 # Make this
@@ -104,6 +104,6 @@ echo "FILENAME: $FILENAME"
 echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
 echo "THRESHOLD: $THRESHOLD"
 
-$PYTHON pipeline_local.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np $n -n_jobs $k > "${TMP}pylogs.log" 2>&1
+$PYTHON pipeline_local.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np $N_VALUE -n_jobs $N_JOBS > "${TMP}pylogs.log" 2>&1
 
-chmod 755 "${TMP}/*/*"
+chmod 755 "${TMP}*/*"
