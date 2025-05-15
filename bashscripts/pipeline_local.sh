@@ -17,7 +17,7 @@ T_VALUE="None"
 MODEL="TSCSTRP"
 N_VALUE=300
 
- TODO : This is for command-line script debugging ; Comment this and switch to form submission
+# TODO : This is for command-line script debugging ; Comment this and switch to form submission
 while getopts ":f:j:m:t:v:n:" opt; do
   case ${opt} in
     f )
