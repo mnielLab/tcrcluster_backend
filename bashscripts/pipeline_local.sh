@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # This the main TCRcluster-1.0 script.
+# To make this work on your local machine, REPLACE THE USERDIR VARIABLE TO WHERE YOU HAVE TCRCLUSTER INSTALLED
 # Yat, May 2025
 
 ###############################################################################
@@ -76,6 +77,7 @@ fi
 filename=$(basename ${FILENAME})
 basenm="${filename%.*}"
 
+
 USERDIR="/home/projects2/riwa/tcrcluster_backend/"
 BASHDIR="${USERDIR}/bashscripts/"
 SRCDIR="${USERDIR}/src/"
@@ -83,17 +85,12 @@ DATADIR="${USERDIR}/data/"
 
 # Use this as TMP dir for the webserver
 TMP=${USERDIR}tmp/${JOBID}/
-# THIS IS FOR COMMANDLINE DEBUG ONLY
 
 # Make this
 mkdir -p ${TMP}
-chmod 755 $TMP
 
 cd ${SRCDIR}
-chmod 755 $BASHDIR
-chmod 755 $DATADIR
-chmod 755 $USERDIR
-chmod 755 $SRCDIR
+
 # Call the Python script with the correctly set threshold
 PYTHON="/home/ctools/opt/anaconda3_202105/bin/python3"
 #PYTHON=/home/people/riwa/anaconda3/envs/cuda/bin/python3.11
@@ -105,5 +102,3 @@ echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
 echo "THRESHOLD: $THRESHOLD"
 
 $PYTHON pipeline_local.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np $N_VALUE -n_jobs $N_JOBS > "${TMP}pylogs.log" 2>&1
-
-chmod 755 "${TMP}*/*"
