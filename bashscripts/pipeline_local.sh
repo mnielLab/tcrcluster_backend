@@ -87,7 +87,7 @@ TMP=${USERDIR}/tmp/${JOBID}/
 
 # Make this
 mkdir -p ${TMP}
-chmod 777 $TMP
+chmod 755 $TMP
 
 cd ${SRCDIR}
 chmod 755 "/home/locals/tools/src/TCRcluster-1.0/src/"
