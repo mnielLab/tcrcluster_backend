@@ -115,15 +115,33 @@ def main():
     assert args['model'] in model_paths.keys(), f"model provided is {args['model']} and is not in the keys of the dict!"
     model_paths = model_paths[args['model']]
     model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=False);
-    # print('Loaded model')
-    # TODO: Handle input with or without header ?_?
+
     index_col = args['index_col']
     label_col = args['label_col']
-    # rest_cols = args['rest_cols']
-    rest_cols = [x for x in df.columns if x not in ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'label']]
-    df.drop_duplicates(['A1', 'A2', 'A3', 'B1', 'B2', 'B3'], inplace=True)
+    seq_cols = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3']
+    rest_cols = [x for x in df.columns if x not in seq_cols+['label']]
+    # Handling of duplicated values
+    has_dupes = df.duplicated(subset=seq_cols).any()
+    if has_dupes:
+        # 1) Keep exactly one row per group (singletons + first of each dup group)
+        df_unique = df.drop_duplicates(subset=seq_cols, keep='first').copy()
 
-    # TODO : Merge latent df back to predicted cluster df
+        # 2) Later duplicates only, keep in another df
+        dup_mask = df.duplicated(subset=seq_cols, keep='first')
+        df_dupes = df.loc[dup_mask].copy()
+
+        # 3) For each duplicate row, attach the index of its first occurrence
+        #    Build a mapping from group -> original index of first occurrence
+        first_index = (df_unique
+        .reset_index()
+        .set_index(seq_cols)['index'])
+        # MultiIndex on seq_cols → first index
+
+        df_dupes = df_dupes.merge(first_index.rename('duplicate_of'),
+                                  left_on=seq_cols, right_index=True, how='left')
+        # re-assign "df" to be the df_unique, re-merge later in the code
+        df = df_unique.copy()
+
     latent_df = get_latent_df(model, df)
 
     # Here, if indices are not provided, we give it a random index column to not have to change all the code
@@ -181,18 +199,18 @@ def main():
     else:
         threshold = float(args['threshold'])
         optimisation_results = None
-    # print('\nSingle threshold\n')
+
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
                                                      label_encoder, threshold,
                                                      min_purity=args['min_purity'], min_size=args['min_size'],
                                                      silhouette_aggregation='micro',
                                                      return_df_and_c=True)
-    # print('Done single threshold')
+
     # Assigning labels and saving
     dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
-    # print('Merged dfs')
+
     clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
     # Here now sort DF / results + plot heatmap
     sorted_dm, sorted_da = get_linkage_sorted_dm(dist_matrix, 'complete', 'cosine', True)
@@ -201,23 +219,16 @@ def main():
     sns.heatmap(sorted_da, ax=ax, square=True, cmap='viridis', xticklabels=False, yticklabels=False)
     results_df = results_df.set_index(index_col).loc[sorted_dm[index_col]].reset_index()
     fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
+
+    # lazy handling of dupes before saving
+    if has_dupes:
+        query = results_df.loc[df_dupes['duplicate_of'].values].copy()
+        for col in query.columns.difference(df_dupes.columns):
+            df_dupes[col] = query[col].values
+        results_df = pd.concat([results_df, df_dupes])
+
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
 
-
-    # dir_path = f'{outdir}'
-    # output_zip = f'{outdir}TCRcluster_outputs.zip'
-    # # Create a zip archive of the entire directory
-    #
-    # with zipfile.ZipFile(output_zip, 'w', zipfile.ZIP_DEFLATED) as zipf:
-    #     for item in os.listdir(dir_path):
-    #         # Exclude the zip file itself
-    #         if item.endswith('.zip'):
-    #             continue
-    #         file_path = os.path.join(dir_path, item)
-    #         if os.path.isfile(file_path):
-    #             zipf.write(file_path, arcname=item)
-    #
-    # print("Directory zipped successfully!")
 
     return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
 

@@ -72,16 +72,23 @@ def _init(DATADIR):
     ICS_KL = None
     ICS_SHANNON = None
     HLAS = None
-    V_MAP = pkl_load(f'{MATRIXDIR}230927_nettcr_dataset_vmap.pkl')
-    J_MAP = pkl_load(f'{MATRIXDIR}230927_nettcr_dataset_jmap.pkl')
-    PEP_MAP = pkl_load(f'{MATRIXDIR}231031_nettcr_pep_map.pkl')
-    PEP_MAP2 = pkl_load(f'{MATRIXDIR}240226_nettcr2-2_alpha_beta_paired_pepmap.pkl')
+    # V_MAP = pkl_load(f'{MATRIXDIR}230927_nettcr_dataset_vmap.pkl')
+    # J_MAP = pkl_load(f'{MATRIXDIR}230927_nettcr_dataset_jmap.pkl')
+    # PEP_MAP = pkl_load(f'{MATRIXDIR}231031_nettcr_pep_map.pkl')
+    # PEP_MAP2 = pkl_load(f'{MATRIXDIR}240226_nettcr2-2_alpha_beta_paired_pepmap.pkl')
+    # return VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, \
+    #        BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, \
+    #        HLAS, ICS_KL, ICS_SHANNON, V_MAP, J_MAP, PEP_MAP, PEP_MAP2
     return VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, \
-           BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, \
-           HLAS, ICS_KL, ICS_SHANNON, V_MAP, J_MAP, PEP_MAP, PEP_MAP2
+               BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, \
+               HLAS, ICS_KL, ICS_SHANNON
 
 
-VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, HLAS, ICS_KL, ICS_SHANNON, V_MAP, J_MAP, PEP_MAP, PEP_MAP2 = _init(
+
+# VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, HLAS, ICS_KL, ICS_SHANNON, V_MAP, J_MAP, PEP_MAP, PEP_MAP2 = _init(
+#     DATADIR)
+
+VAL, N_CORES, DATADIR, AA_KEYS, CHAR_TO_INT, INT_TO_CHAR, BG, BL62FREQ, BL62FREQ_VALUES, BL50, BL50_VALUES, BL62, BL62_VALUES, HLAS, ICS_KL, ICS_SHANNON = _init(
     DATADIR)
 
 encoding_matrix_dict = {'onehot': None,

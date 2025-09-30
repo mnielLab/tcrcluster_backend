@@ -67,6 +67,8 @@ def args_parser():
                         help='Adding a random ID taken from a batchscript that will start all crossvalidation folds. Default = ""')
     parser.add_argument('-n_jobs', dest='n_jobs', default=20, type=int,
                         help='Multiprocessing')
+    parser.add_argument('--debug', dest='debug', type=str2bool, default=False,
+                        help='debug mode overriding n_points')
     return parser.parse_args()
 
 
@@ -81,7 +83,7 @@ def main():
 
     # TODO : Make output filepath work. Here, need args['out'] as None,
     #        Then define the outdir as the ${TMP} given by the bashscript
-    #        For debugging purpouses, here use '../tmp/' so that uniquefilename doesn't use it
+    #        For debugging purposes, here use '../tmp/' so that uniquefilename doesn't use it
     # print(args)
     unique_filename, jobid, connector = make_jobid_filename(args)
 
@@ -115,20 +117,33 @@ def main():
     assert args['model'] in model_paths.keys(), f"model provided is {args['model']} and is not in the keys of the dict!"
     model_paths = model_paths[args['model']]
     model = load_model_full(model_paths['pt'], model_paths['json'], map_location=args['device'], verbose=False);
-    # print('Loaded model')
-    # TODO: Handle input with or without header ?_?
     index_col = args['index_col']
     label_col = args['label_col']
     # rest_cols = args['rest_cols']
-    rest_cols = [x for x in df.columns if x not in ['A1', 'A2', 'A3', 'B1', 'B2', 'B3', 'label']]
+    seq_cols = ['A1', 'A2', 'A3', 'B1', 'B2', 'B3']
+    rest_cols = [x for x in df.columns if x not in seq_cols+['label']]
+    # Handling dupes
+    has_dupes = df.duplicated(subset=seq_cols).any()
+    if has_dupes:
+        # 1) Keep exactly one row per group (singletons + first of each dup group)
+        df_unique = df.drop_duplicates(subset=seq_cols, keep='first').copy()
 
-    # # TODO : phase this out ;
-    # weight_col = args['weight_col']
-    # if weight_col is not None:
-    #     if weight_col not in rest_cols and weight_col in df.columns:
-    #         rest_cols.append(weight_col)
+        # 2) Later duplicates only, keep in another df
+        dup_mask = df.duplicated(subset=seq_cols, keep='first')
+        df_dupes = df.loc[dup_mask].copy()
 
-    # TODO : Merge latent df back to predicted cluster df
+        # 3) For each duplicate row, attach the index of its first occurrence
+        #    Build a mapping from group -> original index of first occurrence
+        first_index = (df_unique
+                        .reset_index()
+                        .set_index(seq_cols)['index'])
+        # MultiIndex on seq_cols → first index
+
+        df_dupes = df_dupes.merge(first_index.rename('duplicate_of'),
+                                  left_on=seq_cols, right_index=True, how='left')
+        # re-assign "df" to be the df_unique, re-merge later in the code
+        df = df_unique.copy()
+
     latent_df = get_latent_df(model, df)
 
     # Here, if indices are not provided, we give it a random index column to not have to change all the code
@@ -139,7 +154,6 @@ def main():
         rest_cols.extend([index_col, 'original_input_order'])
         latent_df[index_col] = [f'seq_{i:04}' for i in range(len(latent_df))]
 
-    seq_cols = ('A1', 'A2', 'A3', 'B1', 'B2', 'B3')
 
     # Here, if labels are not provided, we give it a random label column to not have to change all the code
     random_label = label_col is None or label_col == '' or label_col not in latent_df.columns
@@ -150,11 +164,11 @@ def main():
         latent_df[label_col] = np.random.choice(labels, (len(latent_df)), replace=True)
         rest_cols.append(label_col)
 
-    # Trying something here...
-    if 300 > len(latent_df)//3 and 4*len(latent_df) < 300:
-        args['n_points'] = max(50, max(4*len(latent_df), len(latent_df)//3))
-    else:
-        args['n_points'] = len(latent_df)//3
+    if not args['debug']:
+        if 300 > len(latent_df)//3 and 4*len(latent_df) < 300:
+            args['n_points'] = max(50, max(4*len(latent_df), len(latent_df)//3))
+        else:
+            args['n_points'] = len(latent_df)//3
 
     dist_matrix, dist_array, _, labels, encoded_labels, label_encoder = get_distances_labels_from_latent(latent_df,
                                                                                                          label_col,
@@ -165,9 +179,6 @@ def main():
                                                                                                              'low_memory'])
     dist_array = dist_matrix.iloc[:len(dist_matrix), :len(dist_matrix)].values
 
-    # TODO : Nice to have but not required
-    # TODO : MAKE A SORTED DIST MATRIX SOMEHOW
-    #        MAKE A HEATMAP PLOT FOR VIZ
     if args['threshold'] is None or args['threshold'] == "None":
         # print('\nOptim\n')
         optimisation_results = agglo_all_thresholds(dist_array, dist_array, labels, encoded_labels, label_encoder, 5,
@@ -182,31 +193,39 @@ def main():
         optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']] = optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
         optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].round(0)
         optimisation_results.to_csv(f'{outdir}optimisation_results_df.csv')
-        # print('saved optim')
     else:
         threshold = float(args['threshold'])
         optimisation_results = None
-    # print('\nSingle threshold\n')
+
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
                                                      label_encoder, threshold,
                                                      min_purity=args['min_purity'], min_size=args['min_size'],
                                                      silhouette_aggregation='micro',
                                                      return_df_and_c=True)
-    # print('Done single threshold')
     # Assigning labels and saving
     dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
-    # print('Merged dfs')
     clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
     # Here now sort DF / results + plot heatmap
-    sorted_dm, sorted_da = get_linkage_sorted_dm(dist_matrix, 'complete', 'cosine', True)
-    sorted_dm.to_csv(f'{outdir}sorted_cosine_distance_matrix.csv')
-    fig, ax = plt.subplots(1,1, figsize=(9,9))
-    sns.heatmap(sorted_da, ax=ax, square=True, cmap='viridis', xticklabels=False, yticklabels=False)
-    results_df = results_df.set_index(index_col).loc[sorted_dm[index_col]].reset_index()
-    fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
+    if not args['debug']:
+        sorted_dm, sorted_da = get_linkage_sorted_dm(dist_matrix, 'complete', 'cosine', True)
+        sorted_dm.to_csv(f'{outdir}sorted_cosine_distance_matrix.csv')
+        results_df = results_df.set_index(index_col).loc[sorted_dm[index_col]].reset_index()
+        fig, ax = plt.subplots(1, 1, figsize=(9, 9))
+        sns.heatmap(sorted_da, ax=ax, square=True, cmap='viridis', xticklabels=False, yticklabels=False)
+        fig.savefig(f'{outdir}complete_cosine_sorted_heatmap.png', dpi=150)
+
+    # lazy handling of dupes before saving
+    if has_dupes:
+        query = results_df.loc[df_dupes['duplicate_of'].values].copy()
+        for col in query.columns.difference(df_dupes.columns):
+            df_dupes[col] = query[col].values
+        results_df = pd.concat([results_df, df_dupes])
+
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
+
+
 
     return results_df, clusters_df, optimisation_results, unique_filename, jobid, args
 

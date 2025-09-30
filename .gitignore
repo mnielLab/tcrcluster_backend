@@ -6,3 +6,4 @@ models/.DS_Store
 src/.DS_Store
 /tcrcluster_tmp/
 /tmp/
+bashscripts/pipeline_local_macos_riwa.sh
