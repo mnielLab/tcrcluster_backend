@@ -188,15 +188,18 @@ def main():
         optimisation_results['best'] = False
         optimisation_results.loc[
             optimisation_results.iloc[:int(0.8 * len(optimisation_results))]['silhouette'].idxmax(), 'best'] = True
-        plot_sprm(optimisation_results, fn=f'{outdir}optimisation_curves', random_label=random_label)
         threshold = optimisation_results.query('best')['threshold'].item()
         optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']] = optimisation_results[['silhouette', 'mean_purity', 'retention', 'mean_cluster_size']].round(3)
+        plot_sprm(optimisation_results, fn=f'{outdir}optimisation_curves', random_label=random_label)
+        if random_label:
+            optimisation_results.drop(columns = list(filter(lambda x: 'purity' in x, optimisation_results.columns)), inplace=True)
+
         optimisation_results['max_cluster_size'] = optimisation_results['max_cluster_size'].round(0)
+
         optimisation_results.to_csv(f'{outdir}optimisation_results_df.csv')
     else:
         threshold = float(args['threshold'])
         optimisation_results = None
-
     metrics, clusters_df, c = agglo_single_threshold(dist_array, dist_array, labels, encoded_labels,
                                                      label_encoder, threshold,
                                                      min_purity=args['min_purity'], min_size=args['min_size'],
@@ -206,10 +209,15 @@ def main():
     dist_matrix['cluster_label'] = c.labels_
     keep_columns = ['index_col', 'cluster_label']
     results_df = pd.merge(latent_df, dist_matrix[keep_columns], left_on=index_col, right_on=index_col)
-    clusters_df.to_csv(f'{outdir}clusters_summary.csv', index=False)
+    if random_label:
+        results_df.drop(columns=['placeholder_label'], inplace=True)
+        clusters_df.drop(columns=['purity', 'majority_label'], inplace=True)
+
     # Here now sort DF / results + plot heatmap
     if not args['debug']:
         sorted_dm, sorted_da = get_linkage_sorted_dm(dist_matrix, 'complete', 'cosine', True)
+        if random_label:
+            sorted_dm.drop(columns=['placeholder_label'], inplace=True)
         sorted_dm.to_csv(f'{outdir}sorted_cosine_distance_matrix.csv')
         results_df = results_df.set_index(index_col).loc[sorted_dm[index_col]].reset_index()
         fig, ax = plt.subplots(1, 1, figsize=(9, 9))
@@ -223,6 +231,7 @@ def main():
             df_dupes[col] = query[col].values
         results_df = pd.concat([results_df, df_dupes])
 
+    clusters_df.drop(columns=['coherence']) .to_csv(f'{outdir}clusters_summary.csv', index=False)
     results_df.to_csv(f'{outdir}TCRcluster_results.csv', index=False)
 
 

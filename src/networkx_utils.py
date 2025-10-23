@@ -825,18 +825,21 @@ def plot_sprm(df, title=None, fn=None, burn_in=0.05, vline=None, random_label=Fa
         a.axhline(hline, label=hline_label, ls='-.', lw=1, c='b')
     # Take after the 5% of cuts to avoid getting the best silhouette at the very start ?
     a.axvline(df.loc[int(burn_in * len(df)):]['silhouette'].idxmax(), label='max SI', ls=':', lw=1, c='k')
-    a.legend()
+    a.legend(loc='center left')
     a.set_xlabel('Iteration')
     a.set_ylabel('Value (0-1)')
-    twa.legend()
+    twa.legend(loc='upper left')
     if 'n_above' in df.columns:
-        twa.set_ylim([1, max(df['n_above'].max()+2, df['mean_cluster_size'].max()+2)])
+        twa.set_ylim([1, max(df['n_above'].max() + 2, df['mean_cluster_size'].max() + 2)])
     else:
-        twa.set_ylim([1, df['mean_cluster_size'].max()+2])
+        twa.set_ylim([1, df['mean_cluster_size'].max() + 2])
     best = df.loc[[df.loc[int(burn_in * len(df)):]['silhouette'].idxmax()]]
-    title = f'{title}'+f'\n Mean Pur:{best["mean_purity"].item():.3f}, Retention:{best["retention"].item():.3f}, Silhouette:{best["silhouette"].item():.3f}, mean_cluster_size:{best["mean_cluster_size"].item():.2f}'
+
+    title = f'{title}' + f'\nRetention:{best["retention"].item():.3f}, Silhouette:{best["silhouette"].item():.3f}, mean_cluster_size:{best["mean_cluster_size"].item():.2f}'
+    if not random_label:
+        title = f'{title} Mean Pur:{best["mean_purity"].item():.3f}'
     if 'n_above' in df.columns:
-        title = title+f' N_above:{best["n_above"].item():.1f}'
+        title = title + f' N_above:{best["n_above"].item():.1f}'
     if title is not None:
         a.set_title(title)
     if fn is not None:
