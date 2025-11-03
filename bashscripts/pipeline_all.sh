@@ -131,4 +131,4 @@ echo "FILENAME: $FILENAME"
 echo "THRESHOLD_TYPE: $THRESHOLD_TYPE"
 echo "THRESHOLD: $THRESHOLD"
 
-$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 300 -n_jobs 20 #> "${TMP}pylogs.log" 2>&1
+$PYTHON run_pipeline.py -j ${JOBID} -f ${FILENAME} --model ${MODEL} --threshold ${THRESHOLD} --outdir "${TMP}" -np 300 -n_jobs 20 > "${TMP}pylogs.log" 2>&1
