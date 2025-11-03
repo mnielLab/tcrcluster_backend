@@ -14,10 +14,10 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-DATADIR = '/Users/riwa/Documents/code/tclustr/data/' if os.path.exists(os.path.abspath(
-    '/Users/riwa/Documents/code/tclustr/data')) else '/home/projects/vaccine/people/yatwan/tclustr/data/' if os.path.exists(os.path.abspath('/home/projects/vaccine/people/yatwan/tclustr/data/')) else '/home/projects2/riwa/tclustr/data/'
-OUTDIR = '/Users/riwa/Documents/code/tclustr/output/' if os.path.exists(os.path.abspath(
-    '/Users/riwa/Documents/code/tclustr/output')) else '/home/projects/vaccine/people/yatwan/tclustr/output/' if os.path.exists(os.path.abspath('/home/projects/vaccine/people/yatwan/tclustr/output/')) else '/home/projects2/riwa/tclustr/output/'
+DATADIR = '/tools/src/TCRcluster-1.0/data/' if os.path.exists(os.path.abspath(
+    '/tools/src/TCRcluster-1.0/data')) else '/home/projects/vaccine/people/yatwan/tclustr/data/' if os.path.exists(os.path.abspath('/home/projects/vaccine/people/yatwan/tclustr/data/')) else '/home/projects2/riwa/tclustr/data/'
+OUTDIR = '/tools/src/TCRcluster-1.0/output/' if os.path.exists(os.path.abspath(
+    '/tools/src/TCRcluster-1.0/output')) else '/home/projects/vaccine/people/yatwan/tclustr/output/' if os.path.exists(os.path.abspath('/home/projects/vaccine/people/yatwan/tclustr/output/')) else '/home/projects2/riwa/tclustr/output/'
 # Stupid hardcoded variable
 CNN_FEATS = ['EL_ratio', 'anchor_mutation', 'delta_VHSE1', 'delta_VHSE3', 'delta_VHSE7', 'delta_VHSE8',
              'delta_aliphatic_index',
