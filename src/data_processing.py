@@ -15,9 +15,9 @@ import warnings
 warnings.filterwarnings('ignore')
 
 DATADIR = '/tools/src/TCRcluster-1.0/data/' if os.path.exists(os.path.abspath(
-    '/tools/src/TCRcluster-1.0/data')) else '/home/projects/vaccine/people/yatwan/tclustr/data/' if os.path.exists(os.path.abspath('/home/projects/vaccine/people/yatwan/tclustr/data/')) else '/home/projects2/riwa/tclustr/data/'
+    '/tools/src/TCRcluster-1.0/data')) else '/home/projects2/riwa/tcrcluster_backend/data/' if os.path.exists(os.path.abspath('/home/projects2/riwa/tcrcluster_backend/data/')) else '/home/projects2/riwa/tclustr/data/'
 OUTDIR = '/tools/src/TCRcluster-1.0/output/' if os.path.exists(os.path.abspath(
-    '/tools/src/TCRcluster-1.0/output')) else '/home/projects/vaccine/people/yatwan/tclustr/output/' if os.path.exists(os.path.abspath('/home/projects/vaccine/people/yatwan/tclustr/output/')) else '/home/projects2/riwa/tclustr/output/'
+    '/tools/src/TCRcluster-1.0/output')) else '/home/projects2/riwa/tcrcluster_backend/output/' if os.path.exists(os.path.abspath('/home/projects2/riwa/tcrcluster_backend/output/')) else '/home/projects2/riwa/tclustr/output/'
 # Stupid hardcoded variable
 CNN_FEATS = ['EL_ratio', 'anchor_mutation', 'delta_VHSE1', 'delta_VHSE3', 'delta_VHSE7', 'delta_VHSE8',
              'delta_aliphatic_index',
